@@ -1,9 +1,14 @@
 import {
+  ILayoutRestorer,
   JupyterFrontEnd,
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
 
-import { ICommandPalette } from '@jupyterlab/apputils';
+import {
+  ICommandPalette,
+  MainAreaWidget,
+  WidgetTracker,
+} from '@jupyterlab/apputils';
 
 import { ILauncher } from '@jupyterlab/launcher';
 
@@ -42,12 +47,14 @@ namespace CommandIDs {
  * @param app Jupyter Font End
  * @param launcher Jupyter Launcher
  * @param translator Jupyter Translator
+ * @param restorer Jupyter LayoutRestorer
  * @param palette [Optional] Jupyter Commands Palette
  */
 function activate(
   app: JupyterFrontEnd,
   launcher: ILauncher,
   translator: ITranslator,
+  restorer: ILayoutRestorer,
   palette: ICommandPalette | null,
 ): void {
   console.log('Welcome to graphscope-jupyterlab extension!')
@@ -56,10 +63,13 @@ function activate(
   const trans = translator.load('jupyterlab');
 
   const command = CommandIDs.open;
+  const namespace = "graphscope"
   const icon = new LabIcon({
     name: 'launcher:icon',
     svgstr: graphscopeIconStr,
   });
+
+  let widget : MainAreaWidget<GSWidget>;
  
   // Add launcher
   launcher.add({
@@ -73,8 +83,20 @@ function activate(
     caption: 'GraphScope Jupyterlab Extension',
     icon: icon,
     execute: args => {
-      const widget = new GSWidget();
-      shell.add(widget, 'main', { activate: false, mode: 'split-right'});
+      if (!widget || widget.isDisposed) {
+        // Create a new widget if one does not exist
+        // or if the previous one was disposed after closing the panel
+        const content = new GSWidget();
+        widget = new MainAreaWidget({content});
+      }
+      if (!tracker.has(widget)) {
+        tracker.add(widget);
+      }
+      if (!widget.isAttached) {
+        // Attach the widget to the main area if it's not there
+        shell.add(widget, 'main', { activate: false, mode: 'split-right'});
+      }
+      shell.activateById(widget.id);
     },
   });
 
@@ -86,6 +108,15 @@ function activate(
       category: trans.__(PALETTE_CATEGORY),
     })
   }
+
+  // Track and restore the widget state
+  let tracker = new WidgetTracker<MainAreaWidget<GSWidget>>({
+    namespace: namespace
+  });
+  restorer.restore(tracker, {
+    command,
+    name: () => namespace
+  });
 }
 
 /**
@@ -94,7 +125,7 @@ function activate(
 const extension: JupyterFrontEndPlugin<void> = {
   id: 'graphscope-jupyterlab:plugin',
   autoStart: true,
-  requires: [ILauncher, ITranslator],
+  requires: [ILauncher, ITranslator, ILayoutRestorer],
   optional: [ICommandPalette],
   activate: activate
 };
