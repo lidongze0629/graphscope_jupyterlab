@@ -11,20 +11,29 @@ import { ITranslator } from '@jupyterlab/translation';
 
 import { LabIcon } from '@jupyterlab/ui-components';
 
+import { Widget } from '@lumino/widgets';
+
 import graphscopeIconStr from '../style/graphscope.svg';
 
 
 const PALETTE_CATEGORY = 'GraphScope PALETTE'
 
-namespace CommandIDs {
-  export const create = "graphscope-launcher:create";
+/**
+ *  GraphScope Custom Widget
+ */
+class GSWidget extends Widget {
+  constructor() {
+    super();
+    // this.addClass('jp-example-view');
+    this.id = 'graphscope-widget';
+    this.title.label = 'GraphScope Jupyterlab';
+    this.title.closable = true;
+  }
 }
 
-/**
- * 
- */
-function create() : void {
-  console.log("execute the launcher create comnand.");
+
+namespace CommandIDs {
+  export const open = "graphscope-launcher:open";
 }
 
 /**
@@ -43,32 +52,36 @@ function activate(
 ): void {
   console.log('Welcome to graphscope-jupyterlab extension!')
 
-  const { commands } = app;
-  
+  const { commands, shell } = app;
+  const trans = translator.load('jupyterlab');
+
+  const command = CommandIDs.open;
   const icon = new LabIcon({
     name: 'launcher:icon',
     svgstr: graphscopeIconStr,
   });
-  const trans = translator.load('jupyterlab');
-
+ 
   // Add launcher
   launcher.add({
-    command: CommandIDs.create,
+    command,
     category: "Other",
   });
 
   // Add commands to registry
-  commands.addCommand(CommandIDs.create, {
+  commands.addCommand(command, {
     label: 'GraphScope',
     caption: 'GraphScope Jupyterlab Extension',
     icon: icon,
-    execute: create,
+    execute: args => {
+      const widget = new GSWidget();
+      shell.add(widget, 'main', { activate: false, mode: 'split-right'});
+    },
   });
 
   // Add the command to the palette
   if (palette) {
     palette.addItem({
-      command: trans.__(CommandIDs.create),
+      command,
       args: { isPalette: true },
       category: trans.__(PALETTE_CATEGORY),
     })
