@@ -1,4 +1,5 @@
 import {
+  ILabShell,
   ILayoutRestorer,
   JupyterFrontEnd,
   JupyterFrontEndPlugin
@@ -6,8 +7,8 @@ import {
 
 import {
   ICommandPalette,
-  MainAreaWidget,
-  WidgetTracker,
+  // MainAreaWidget,
+  // WidgetTracker,
 } from '@jupyterlab/apputils';
 
 import { ILauncher } from '@jupyterlab/launcher';
@@ -16,30 +17,32 @@ import { ITranslator } from '@jupyterlab/translation';
 
 import { LabIcon } from '@jupyterlab/ui-components';
 
-import { Widget } from '@lumino/widgets';
+// import { Panel, Widget } from '@lumino/widgets';
+
+// import { reactIcon } from '@jupyterlab/ui-components';
 
 import graphscopeIconStr from '../style/graphscope.svg';
 
+import { GSWidget } from './widget';
 
-const PALETTE_CATEGORY = 'GraphScope PALETTE'
+// const PALETTE_CATEGORY = 'GraphScope PALETTE'
+
+// namespace CommandIDs {
+  // export const open = "graphscope-launcher:open";
+// }
 
 /**
- *  GraphScope Custom Widget
+ * Initialization data for the graphscope-jupyterlab extension.
  */
-class GSWidget extends Widget {
-  constructor() {
-    super();
-    // this.addClass('jp-example-view');
-    this.id = 'graphscope-widget';
-    this.title.label = 'GraphScope Jupyterlab';
-    this.title.closable = true;
-  }
-}
+ const extension: JupyterFrontEndPlugin<void> = {
+  id: 'graphscope-jupyterlab:plugin',
+  autoStart: true,
+  requires: [ILauncher, ITranslator, ILayoutRestorer],
+  optional: [ICommandPalette, ILabShell],
+  activate: activate
+};
 
-
-namespace CommandIDs {
-  export const open = "graphscope-launcher:open";
-}
+export default extension;
 
 /**
  * Activate the JupyterLab extension.
@@ -49,6 +52,7 @@ namespace CommandIDs {
  * @param translator Jupyter Translator
  * @param restorer Jupyter LayoutRestorer
  * @param palette [Optional] Jupyter Commands Palette
+ * @param labShell [Optional] Jupyter ILabShell
  */
 function activate(
   app: JupyterFrontEnd,
@@ -56,9 +60,19 @@ function activate(
   translator: ITranslator,
   restorer: ILayoutRestorer,
   palette: ICommandPalette | null,
+  labShell: ILabShell | null,
 ): void {
-  console.log('Welcome to graphscope-jupyterlab extension!')
+  const { shell } = app;
 
+  // icon
+  const icon = new LabIcon({ name: 'launcher:icon', svgstr: graphscopeIconStr });
+  const gsWidget = new GSWidget(icon, translator);
+
+  // add left sidebar with rank 501
+  // rank(501-899): reserved for third-party extensions.
+  shell.add(gsWidget, 'left', { rank: 501 });
+
+  /*
   const { commands, shell } = app;
   const trans = translator.load('jupyterlab');
 
@@ -76,6 +90,13 @@ function activate(
     command,
     category: "Other",
   });
+
+  // Add left sidebar
+  let w  = new Panel();
+  w.id = 'xxxx';
+  w.title.icon = icon;
+  w.title.closable = true;
+  shell.add(w, 'left');
 
   // Add commands to registry
   commands.addCommand(command, {
@@ -117,17 +138,5 @@ function activate(
     command,
     name: () => namespace
   });
+  */
 }
-
-/**
- * Initialization data for the graphscope-jupyterlab extension.
- */
-const extension: JupyterFrontEndPlugin<void> = {
-  id: 'graphscope-jupyterlab:plugin',
-  autoStart: true,
-  requires: [ILauncher, ITranslator, ILayoutRestorer],
-  optional: [ICommandPalette],
-  activate: activate
-};
-
-export default extension;
