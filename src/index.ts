@@ -7,7 +7,7 @@ import {
 
 import {
   ICommandPalette,
-  // MainAreaWidget,
+  MainAreaWidget,
   // WidgetTracker,
 } from '@jupyterlab/apputils';
 
@@ -23,13 +23,15 @@ import { LabIcon } from '@jupyterlab/ui-components';
 
 import graphscopeIconStr from '../style/graphscope.svg';
 
-import { GSWidget } from './widget';
+import {
+  CommandIDs,
+  GSWidget,
+  GSSideBarWidget,
+} from './widget';
 
-// const PALETTE_CATEGORY = 'GraphScope PALETTE'
+// const NAMESPACE = "graphscope"
 
-// namespace CommandIDs {
-  // export const open = "graphscope-launcher:open";
-// }
+const PALETTE_CATEGORY = 'GraphScope PALETTE'
 
 /**
  * Initialization data for the graphscope-jupyterlab extension.
@@ -62,62 +64,38 @@ function activate(
   palette: ICommandPalette | null,
   labShell: ILabShell | null,
 ): void {
-  const { shell } = app;
-
-  // icon
-  const icon = new LabIcon({ name: 'launcher:icon', svgstr: graphscopeIconStr });
-  const gsWidget = new GSWidget(icon, translator);
-
-  // add left sidebar with rank 501
-  // rank(501-899): reserved for third-party extensions.
-  shell.add(gsWidget, 'left', { rank: 501 });
-
-  /*
   const { commands, shell } = app;
   const trans = translator.load('jupyterlab');
+  // icon
+  const icon = new LabIcon({ name: 'launcher:icon', svgstr: graphscopeIconStr });
 
+  // register command
   const command = CommandIDs.open;
-  const namespace = "graphscope"
-  const icon = new LabIcon({
-    name: 'launcher:icon',
-    svgstr: graphscopeIconStr,
-  });
+  // let widget : MainAreaWidget<GSWidget>;
 
-  let widget : MainAreaWidget<GSWidget>;
- 
-  // Add launcher
-  launcher.add({
-    command,
-    category: "Other",
-  });
-
-  // Add left sidebar
-  let w  = new Panel();
-  w.id = 'xxxx';
-  w.title.icon = icon;
-  w.title.closable = true;
-  shell.add(w, 'left');
-
-  // Add commands to registry
   commands.addCommand(command, {
     label: 'GraphScope',
     caption: 'GraphScope Jupyterlab Extension',
     icon: icon,
     execute: args => {
-      if (!widget || widget.isDisposed) {
+      const content = new GSWidget(icon, translator);
+      let widget = new MainAreaWidget({content});
+
+      shell.add(widget, 'main', { activate: true, mode: 'split-right'});
+      // if (!widget || widget.isDisposed) {
         // Create a new widget if one does not exist
         // or if the previous one was disposed after closing the panel
-        const content = new GSWidget();
-        widget = new MainAreaWidget({content});
-      }
-      if (!tracker.has(widget)) {
-        tracker.add(widget);
-      }
-      if (!widget.isAttached) {
+        // const content = new GSWidget(icon, translator);
+        // widget = new MainAreaWidget({content});
+      // }
+      // if (!tracker.has(widget)) {
+        // tracker.add(widget);
+      // }
+      // if (!widget.isAttached) {
         // Attach the widget to the main area if it's not there
-        shell.add(widget, 'main', { activate: false, mode: 'split-right'});
-      }
-      shell.activateById(widget.id);
+        // shell.add(widget, 'main', { activate: false, mode: 'split-right'});
+      // }
+      // shell.activateById(widget.id);
     },
   });
 
@@ -129,6 +107,18 @@ function activate(
       category: trans.__(PALETTE_CATEGORY),
     })
   }
+
+  // add left sidebar with rank 501
+  // rank(501-899): reserved for third-party extensions.
+  const gsSideBarWidget = new GSSideBarWidget(commands, icon, translator);
+  shell.add(gsSideBarWidget, 'left', { rank: 501 });
+
+  /*
+  // Add launcher
+  launcher.add({
+    command,
+    category: "Other",
+  });
 
   // Track and restore the widget state
   let tracker = new WidgetTracker<MainAreaWidget<GSWidget>>({
