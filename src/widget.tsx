@@ -4,9 +4,9 @@ import { CommandRegistry } from '@lumino/commands';
 
 import { ITranslator, nullTranslator } from '@jupyterlab/translation';
 
-import { LabIcon } from '@jupyterlab/ui-components';
+import { CommandIDs, gsIcon, PALETTE_CATEGORY, NAMESPACE } from './common';
 
-import { StackedPanel } from '@lumino/widgets';
+import { Widget } from '@lumino/widgets';
 
 import React from 'react';
 
@@ -42,22 +42,20 @@ function GSComponent(props: {
 /**
  * GraphScope Main Area Widget
  */
-export class GSWidget extends StackedPanel {
+export class GSWidget extends Widget {
     /**
      * Constructs a new GSWidget.
      */
-    constructor(icon: LabIcon, translator?: ITranslator) {
+    constructor(translator?: ITranslator) {
         super();
 
-        this.icon = icon;
         this.translator = translator || nullTranslator;
 
-        this.id = "GraphScope Widget";
-        this.title.icon = icon;
+        this.id = "gs-mainarea-widget";
+        this.title.icon = gsIcon;
         this.title.closable = true;
     }
 
-    protected icon: LabIcon;
     protected translator: ITranslator;
 }
 
@@ -68,14 +66,13 @@ export class GSSideBarWidget extends ReactWidget {
     /**
      * Constructs a new GSSideBarWidget.
      */
-    constructor(commands: CommandRegistry, icon: LabIcon, translator?: ITranslator) {
+    constructor(commands: CommandRegistry, translator?: ITranslator) {
         super();
         this.commands = commands;
-        this.icon = icon;
         this.translator = translator || nullTranslator;
 
         this.id = "GraphScope SideBar Widget";
-        this.title.icon = icon;
+        this.title.icon = gsIcon;
         this.title.closable = true;
 
         this.addClass('jp-GSWidget');
@@ -91,10 +88,5 @@ export class GSSideBarWidget extends ReactWidget {
     }
 
     protected commands: CommandRegistry;
-    protected icon: LabIcon;
     protected translator: ITranslator;
-}
-
-export namespace CommandIDs {
-    export const open = "gs-graph-schema:open";
 }

@@ -1,132 +1,90 @@
-import {
-  ILabShell,
-  ILayoutRestorer,
-  JupyterFrontEnd,
-  JupyterFrontEndPlugin
-} from '@jupyterlab/application';
+import { ILabShell, ILayoutRestorer, JupyterFrontEnd, JupyterFrontEndPlugin } from '@jupyterlab/application';
 
-import {
-  ICommandPalette,
-  MainAreaWidget,
-  // WidgetTracker,
-} from '@jupyterlab/apputils';
-
-import { ILauncher } from '@jupyterlab/launcher';
+import { ICommandPalette, WidgetTracker } from '@jupyterlab/apputils';
 
 import { ITranslator } from '@jupyterlab/translation';
 
-import { LabIcon } from '@jupyterlab/ui-components';
+import { CommandIDs, gsIcon, PALETTE_CATEGORY, NAMESPACE } from './common';
 
-// import { Panel, Widget } from '@lumino/widgets';
+import { GSVariableManager, IGSVariableManager } from './manager';
 
-// import { reactIcon } from '@jupyterlab/ui-components';
-
-import graphscopeIconStr from '../style/graphscope.svg';
-
-import {
-  CommandIDs,
-  GSWidget,
-  GSSideBarWidget,
-} from './widget';
-
-// const NAMESPACE = "graphscope"
-
-const PALETTE_CATEGORY = 'GraphScope PALETTE'
+import { GSWidget, GSSideBarWidget } from './widget';
 
 /**
- * Initialization data for the graphscope-jupyterlab extension.
+ * A service providing variable inspection.
  */
- const extension: JupyterFrontEndPlugin<void> = {
-  id: 'graphscope-jupyterlab:plugin',
+const variableinspector: JupyterFrontEndPlugin<IGSVariableManager> = {
+  id: '@grgraphscope-jupyterlab:plugin',
   autoStart: true,
-  requires: [ILauncher, ITranslator, ILayoutRestorer],
-  optional: [ICommandPalette, ILabShell],
-  activate: activate
-};
+  requires: [ILabShell, ILayoutRestorer, ITranslator],
+  optional: [ICommandPalette],
+  provides: IGSVariableManager,
+  activate: (
+    app: JupyterFrontEnd,
+    labShell: ILabShell,
+    restorer: ILayoutRestorer,
+    translator: ITranslator,
+    palette: ICommandPalette | null,
+  ): IGSVariableManager => {
+    const { commands } = app;
+    const command = CommandIDs.open;
+    // track and restore the widget state
+    const tracker = new WidgetTracker<GSWidget>({ namespace: NAMESPACE });
 
-export default extension;
+    const manager = new GSVariableManager();
 
-/**
- * Activate the JupyterLab extension.
- *
- * @param app Jupyter Font End
- * @param launcher Jupyter Launcher
- * @param translator Jupyter Translator
- * @param restorer Jupyter LayoutRestorer
- * @param palette [Optional] Jupyter Commands Palette
- * @param labShell [Optional] Jupyter ILabShell
- */
-function activate(
-  app: JupyterFrontEnd,
-  launcher: ILauncher,
-  translator: ITranslator,
-  restorer: ILayoutRestorer,
-  palette: ICommandPalette | null,
-  labShell: ILabShell | null,
-): void {
-  const { commands, shell } = app;
-  const trans = translator.load('jupyterlab');
-  // icon
-  const icon = new LabIcon({ name: 'launcher:icon', svgstr: graphscopeIconStr });
+    /**
+     * create and track a new inspector.
+     */
+    function newPanel(): GSWidget {
+      const panel = new GSWidget();
+      panel.disposed.connect(() => {
+        if (manager.panel == panel) {
+          manager.panel = null;
+        }
+      });
 
-  // register command
-  const command = CommandIDs.open;
-  // let widget : MainAreaWidget<GSWidget>;
+      // track the panel
+      tracker.add(panel);
 
-  commands.addCommand(command, {
-    label: 'GraphScope',
-    caption: 'GraphScope Jupyterlab Extension',
-    icon: icon,
-    execute: args => {
-      const content = new GSWidget(icon, translator);
-      let widget = new MainAreaWidget({content});
+      return panel;
+    }
 
-      shell.add(widget, 'main', { activate: true, mode: 'split-right'});
-      // if (!widget || widget.isDisposed) {
-        // Create a new widget if one does not exist
-        // or if the previous one was disposed after closing the panel
-        // const content = new GSWidget(icon, translator);
-        // widget = new MainAreaWidget({content});
-      // }
-      // if (!tracker.has(widget)) {
-        // tracker.add(widget);
-      // }
-      // if (!widget.isAttached) {
-        // Attach the widget to the main area if it's not there
-        // shell.add(widget, 'main', { activate: false, mode: 'split-right'});
-      // }
-      // shell.activateById(widget.id);
-    },
-  });
-
-  // Add the command to the palette
-  if (palette) {
-    palette.addItem({
+    // enable state restoration
+    restorer.restore(tracker, {
       command,
-      args: { isPalette: true },
-      category: trans.__(PALETTE_CATEGORY),
+      args: () => null,
+      name: () => NAMESPACE,
     })
-  }
 
-  // add left sidebar with rank 501
-  // rank(501-899): reserved for third-party extensions.
-  const gsSideBarWidget = new GSSideBarWidget(commands, icon, translator);
-  shell.add(gsSideBarWidget, 'left', { rank: 501 });
+    // register command to command system
+    commands.addCommand(command, {
+      label: 'GraphScope',
+      caption: 'GraphScope Jupyterlab Extension',
+      icon: gsIcon,
+      execute: args => {
+        if (!manager.panel || manager.panel.isDisposed) {
+          manager.panel = newPanel();
+        }
+        if (!manager.panel.isAttached) {
+          labShell.add(manager.panel, 'main', { mode: 'split-right' });
+        }
+        if (manager.handler) {
+          manager.handler.performInspection();
+        }
+        labShell.activateById(manager.panel.id);
+      },
+    });
+  
+    // add the command to the palette
+    if (palette) {
+      palette.addItem({
+        command,
+        args: { isPalette: true },
+        category: PALETTE_CATEGORY,
+      })
+    }
 
-  /*
-  // Add launcher
-  launcher.add({
-    command,
-    category: "Other",
-  });
-
-  // Track and restore the widget state
-  let tracker = new WidgetTracker<MainAreaWidget<GSWidget>>({
-    namespace: namespace
-  });
-  restorer.restore(tracker, {
-    command,
-    name: () => namespace
-  });
-  */
-}
+    return manager;
+  },
+};

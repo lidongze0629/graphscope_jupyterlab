@@ -10,13 +10,11 @@ export namespace CommandIDs {
     export const open = "gs-graph-schema:open";
 }
 
-
 /**
  * Icon
  */
 const gsIcon = new LabIcon({ name: 'graphscope:icon', svgstr: graphscopeIconStr })
 export { gsIcon };
-
 
 /**
  * Palette Category
@@ -24,9 +22,8 @@ export { gsIcon };
 const PALETTE_CATEGORY = "graphscope"
 export { PALETTE_CATEGORY };
 
-
 /**
  * Namespace
  */
-const NAMESPACE = "graphscope"
+const ß = "graphscope"
 export { NAMESPACE };

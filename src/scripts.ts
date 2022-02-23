@@ -18,7 +18,7 @@ export abstract class Languages {
     /**
      * Init script for ipython(python3) kernel
      */
-    static py_script = `
+    static py_init_script = `
 import json
 import sys
 
@@ -67,7 +67,7 @@ def _gs_jupyterlab_delete_variable(x):
      */
     static scripts: { [lang: string]: Languages.LanguageModel } = {
         python3: {
-            initScript: Languages.py_script,
+            initScript: Languages.py_init_script,
             queryCommand: '_gs_jupyterlab_inspect_variable()',
             deleteCommand: '_gs_jupyterlab_delete_variable',
         }
