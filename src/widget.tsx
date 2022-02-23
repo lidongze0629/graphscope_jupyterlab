@@ -4,14 +4,17 @@ import { CommandRegistry } from '@lumino/commands';
 
 import { ITranslator, nullTranslator } from '@jupyterlab/translation';
 
-import { CommandIDs, gsIcon, PALETTE_CATEGORY, NAMESPACE } from './common';
-
 import { Widget } from '@lumino/widgets';
 
 import React from 'react';
 
+import { CommandIDs, gsIcon } from './common';
+
+import { IVariableInspector, VariableInspector } from './variableinspector';
+
+
 /**
- * React component for GraphScope
+ * React component
  * 
  * @return The React component
  */
@@ -28,7 +31,6 @@ function GSComponent(props: {
             <div>
                 <button
                     onClick={(): void => {
-                        console.log(trans.__(CommandIDs.open));
                         commands.execute(trans.__(CommandIDs.open));
                     }}
                 >
@@ -40,27 +42,68 @@ function GSComponent(props: {
 }
 
 /**
- * GraphScope Main Area Widget
+ * Main Area Widget
  */
-export class GSWidget extends Widget {
-    /**
-     * Constructs a new GSWidget.
-     */
+export class GSWidget extends Widget implements IVariableInspector {
     constructor(translator?: ITranslator) {
         super();
-
-        this.translator = translator || nullTranslator;
 
         this.id = "gs-mainarea-widget";
         this.title.icon = gsIcon;
         this.title.closable = true;
+
+        this.translator = translator || nullTranslator;
     }
 
+    get handler() : VariableInspector.IInspectable | null {
+        return this._handler;
+    }
+
+    set handler(handler: VariableInspector.IInspectable | null) {
+        if (this._handler == handler) {
+            return;
+        }
+        // remove old subscriptions
+        if (this._handler) {
+            this._handler.inspected.disconnect(this.onInspectorUpdate, this);
+            this._handler.disposed.disconnect(this.onHandlerDisposed, this);
+        }
+        this._handler = handler;
+        // subscriptions
+        if (this._handler) {
+            this._handler.inspected.connect(this.onInspectorUpdate, this);
+            this._handler.disposed.connect(this.onHandlerDisposed, this);
+            this._handler.performInspection();
+        }
+    }
+
+    dispose(): void {
+        if (!this.isDisposed) {
+            this.handler = null;
+            super.dispose();
+        }
+    }
+
+    protected onInspectorUpdate(
+        sender: any, args: VariableInspector.IVariableInspectorUpdate
+    ): void {
+        // TODO
+        console.log("accrss onInspectorUpdate")
+    }
+
+    /**
+     * Handle handler disposed signals.
+     */
+    protected onHandlerDisposed(sender: any, args: void): void {
+        this.handler = null;
+    }
+
+    private _handler: VariableInspector.IInspectable | null = null;
     protected translator: ITranslator;
 }
 
 /**
- * GraphScope Sidebar Widget
+ * Sidebar Widget
  */
 export class GSSideBarWidget extends ReactWidget {
     /**

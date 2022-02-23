@@ -1,5 +1,3 @@
-import { rKernelIcon } from "@jupyterlab/ui-components";
-
 /**
  * Languages Model
  */
@@ -7,7 +5,7 @@ export namespace Languages {
     export type LanguageModel = {
         initScript: string;
         queryCommand: string;
-        deleteCommand: string;
+        // deleteCommand: string;
     };
 }
 
@@ -56,7 +54,7 @@ def _gs_jupyterlab_inspect_variable():
         }
         for _v in values if check(_v)
     ]
-    return jsons.dumps(variable_dict_list)
+    return json.dumps(variable_dict_list)
 
 def _gs_jupyterlab_delete_variable(x):
     exec("del %s" % x, globals())
@@ -69,7 +67,17 @@ def _gs_jupyterlab_delete_variable(x):
         python3: {
             initScript: Languages.py_init_script,
             queryCommand: '_gs_jupyterlab_inspect_variable()',
-            deleteCommand: '_gs_jupyterlab_delete_variable',
+            // deleteCommand: '_gs_jupyterlab_delete_variable',
+        },
+        python2: {
+            initScript: Languages.py_init_script,
+            queryCommand: '_gs_jupyterlab_inspect_variable()',
+            // deleteCommand: '_gs_jupyterlab_delete_variable',
+        },
+        python: {
+            initScript: Languages.py_init_script,
+            queryCommand: '_gs_jupyterlab_inspect_variable()',
+            // deleteCommand: '_gs_jupyterlab_delete_variable',
         }
     };
 

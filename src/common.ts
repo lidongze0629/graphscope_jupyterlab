@@ -25,5 +25,5 @@ export { PALETTE_CATEGORY };
 /**
  * Namespace
  */
-const ß = "graphscope"
+const NAMESPACE = "graphscope"
 export { NAMESPACE };

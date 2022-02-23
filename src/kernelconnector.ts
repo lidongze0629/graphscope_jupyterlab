@@ -51,7 +51,7 @@ export class KernelConnector {
      * A promise that is fulfilled when the session assosiated with the connector is ready. 
      */
     get ready(): Promise<void> {
-        return this._session_context.ready;ß
+        return this._session_context.ready;
     }
 
     /**
