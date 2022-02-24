@@ -4,8 +4,6 @@ import { CommandRegistry } from '@lumino/commands';
 
 import { ITranslator, nullTranslator } from '@jupyterlab/translation';
 
-import { Widget } from '@lumino/widgets';
-
 import React from 'react';
 
 import { CommandIDs, gsIcon } from './common';
@@ -14,11 +12,11 @@ import { IVariableInspector, VariableInspector } from './variableinspector';
 
 
 /**
- * React component
+ * Sidebar react component
  * 
- * @return The React component
+ * @return The react component
  */
-function GSComponent(props: {
+function GSSideBarComponent(props: {
     commands: CommandRegistry,
     translator?: ITranslator;
 }) {
@@ -42,9 +40,25 @@ function GSComponent(props: {
 }
 
 /**
- * Main Area Widget
+ * Main area react component
+ *
+ * @return The react component
  */
-export class GSWidget extends Widget implements IVariableInspector {
+function GSMainAreaComponent(props: {}) {
+    const [counter, setCounter] = useState(0);
+
+    console.log('access GSMainAreaComponent render');
+    return (
+        <>
+            <div></div>
+        </>
+    )
+}
+
+/**
+ * Main area widget
+ */
+export class GSWidget extends ReactWidget implements IVariableInspector {
     constructor(translator?: ITranslator) {
         super();
 
@@ -88,7 +102,6 @@ export class GSWidget extends Widget implements IVariableInspector {
         sender: any, args: VariableInspector.IVariableInspectorUpdate
     ): void {
         // TODO
-        console.log("accrss onInspectorUpdate")
     }
 
     /**
@@ -98,12 +111,18 @@ export class GSWidget extends Widget implements IVariableInspector {
         this.handler = null;
     }
 
+    protected render(): JSX.Element {
+        return (
+            <GSMainAreaComponent/>
+        );
+    }
+
     private _handler: VariableInspector.IInspectable | null = null;
     protected translator: ITranslator;
 }
 
 /**
- * Sidebar Widget
+ * Sidebar widget
  */
 export class GSSideBarWidget extends ReactWidget {
     /**
@@ -123,7 +142,7 @@ export class GSSideBarWidget extends ReactWidget {
 
     protected render(): JSX.Element {
         return (
-            <GSComponent
+            <GSSideBarComponent
                 commands={this.commands}
                 translator={this.translator}
             />

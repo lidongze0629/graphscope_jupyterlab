@@ -123,8 +123,6 @@ const notebooks: JupyterFrontEndPlugin<void> = {
        * and add a promise for a instanced handler to the 'handlers' collection.
        */
       notebooks.widgetAdded.connect((sender, nbPanel: NotebookPanel) => {
-        console.log("create a new notebook.")
-
         handlers[nbPanel.id] = new Promise((resolve, reject) => {
           const session_context = nbPanel.sessionContext;
           const connector = new KernelConnector({ session_context });
@@ -172,8 +170,6 @@ const notebooks: JupyterFrontEndPlugin<void> = {
        * been initialized and updates the manager with it.
        */
       labShell.currentChanged.connect((sender, args) => {
-        console.log("notebook changed")
-
         const widget = args.newValue;
         if (!widget || ! notebooks.has(widget)) {
           return;

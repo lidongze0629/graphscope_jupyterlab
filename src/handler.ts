@@ -8,6 +8,8 @@ import {
     IExecuteInputMsg,
 } from '@jupyterlab/services/lib/kernel/messages';
 
+import { IExecuteResult } from '@jupyterlab/nbformat';
+
 import { ISignal, Signal } from '@lumino/signaling';
 
 import { KernelConnector } from './kernelconnector';
@@ -49,7 +51,7 @@ export class VariableInspectionHandler implements IDisposable, VariableInspector
 
             this._ready = ready.then(() => {
                 this._initOnKernel().then((msg: KernelMessage.IExecuteReplyMsg) => {
-                    this._connector.iopubMessage.connect(this._queryCall);
+                    this._connector.iopubMessage.connect(this._queryCall, this);
                     this.performInspection();
                 });
             });
@@ -102,15 +104,33 @@ export class VariableInspectionHandler implements IDisposable, VariableInspector
             stop_on_error: false,
             store_history: false,
         }
-        this._connector.execute_with_callback(content, this._handleQueryResponse);
+        this._connector.execute_with_callback(content, this._handleQueryResponse.bind(this));
     }
 
-    /**
-     * Handle query response. Emit
-     */
-    private _handleQueryResponse(response: KernelMessage.IIOPubMessage) {
-        // TODO (dongze)
-        console.log("[DEBUG result]: ", response);
+    private _handleQueryResponse(response: KernelMessage.IIOPubMessage) : void {
+        const type = response.header.msg_type;
+        switch (type) {
+            case 'execute_result': {
+                const payload = response.content as IExecuteResult;
+                let content: string = payload.data['text/plain'] as string;
+                if (content.slice(0, 1) === "'" || content.slice(0, 1) === '"') {
+                    content = content.slice(1, -1);
+                    content = content.replace(/\\"/g, '"').replace(/\\'/g, "'");
+                }
+                const update = JSON.parse(content) as VariableInspector.IVariable[];
+                const title = {
+                    kernelName: this._connector.kernelName || '',
+                    contextName: '',
+                }
+                this._inspected.emit({
+                    title: title, payload: update
+                } as VariableInspector.IVariableInspectorUpdate );
+
+                break;
+            }
+            default:
+                break;
+        }
     }
 
     /**
@@ -137,7 +157,6 @@ export class VariableInspectionHandler implements IDisposable, VariableInspector
             case 'execute_input': {
                 const code = (msg as IExecuteInputMsg).content.code;
                 if (!(code === this._queryCommand)) {
-                    console.log("Code is ", code)
                     this.performInspection();
                 }
                 break;

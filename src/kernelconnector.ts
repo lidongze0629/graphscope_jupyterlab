@@ -66,7 +66,7 @@ export class KernelConnector {
      */
     execute_with_callback(
         content: KernelMessage.IExecuteRequestMsg['content'],
-        callback: (msg: KernelMessage.IIOPubMessage) => any
+        ioCallback: (msg: KernelMessage.IIOPubMessage) => any
     ): Promise<KernelMessage.IExecuteReplyMsg> {
         const kernel = this._session_context!.session!.kernel;
         if (!kernel) {
@@ -76,7 +76,7 @@ export class KernelConnector {
         // execute the request
         const future = kernel.requestExecute(content);
         future.onIOPub = (msg: KernelMessage.IIOPubMessage): void => {
-            callback(msg);
+            ioCallback(msg);
         };
         return future.done as Promise<KernelMessage.IExecuteReplyMsg>;
     }
