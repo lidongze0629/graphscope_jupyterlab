@@ -1,8 +1,10 @@
-import { ReactWidget } from '@jupyterlab/apputils';
+import { ReactWidget, UseSignal } from '@jupyterlab/apputils';
 
 import { CommandRegistry } from '@lumino/commands';
 
 import { ITranslator, nullTranslator } from '@jupyterlab/translation';
+
+import { ISignal, Signal } from '@lumino/signaling';
 
 import React from 'react';
 
@@ -39,18 +41,63 @@ function GSSideBarComponent(props: {
     );
 }
 
+
+function Item(props: {
+    name: string,
+    type: string,
+    content: string
+}) {
+    console.log("Item: ", props.name, props.type, props.content);
+    return (
+        <li>
+            <span>
+                {props.name} {props.type} {props.content}
+            </span>
+        </li>
+    )
+}
+
+
+function ListView(props: {
+    payload: VariableInspector.IVariable[],
+}) {
+    return (
+        <ul>
+            {props.payload.map((variable, i) => {
+                return (
+                    <Item
+                        name={variable.name}
+                        type={variable.type}
+                        content={variable.content}
+                    />
+                )
+            })}
+        </ul>
+    );
+}
+
 /**
  * Main area react component
  *
  * @return The react component
  */
-function GSMainAreaComponent(props: {}) {
-    const [counter, setCounter] = useState(0);
-
-    console.log('access GSMainAreaComponent render');
+function GSMainAreaComponent(props: {
+    widget: GSWidget,
+    signal: ISignal<GSWidget, void>,
+}) {
     return (
         <>
-            <div></div>
+            <div>
+                <UseSignal signal={props.signal}>
+                    {() => {
+                        return (
+                        <ListView
+                            payload={props.widget.payload}
+                        />
+                        )
+                    }}
+                </UseSignal>
+            </div>
         </>
     )
 }
@@ -101,7 +148,14 @@ export class GSWidget extends ReactWidget implements IVariableInspector {
     protected onInspectorUpdate(
         sender: any, args: VariableInspector.IVariableInspectorUpdate
     ): void {
-        // TODO
+        if (!this.isAttached) {
+            return;
+        }
+
+        // const title = args.title;
+        this._payload = args.payload;
+        console.log("payload: ", this._payload)
+        this._runningChanged.emit(void 0);
     }
 
     /**
@@ -111,14 +165,28 @@ export class GSWidget extends ReactWidget implements IVariableInspector {
         this.handler = null;
     }
 
+    get payload(): VariableInspector.IVariable[] {
+        return this._payload;
+    }
+
+    get runningChanged(): ISignal<GSWidget, void> {
+        return this._runningChanged;
+    }
+
     protected render(): JSX.Element {
         return (
-            <GSMainAreaComponent/>
+            <GSMainAreaComponent
+                widget={this}
+                signal={this._runningChanged}
+            />
         );
     }
 
     private _handler: VariableInspector.IInspectable | null = null;
     protected translator: ITranslator;
+
+    private _payload: VariableInspector.IVariable[] = []
+    private _runningChanged = new Signal<this, void>(this);
 }
 
 /**

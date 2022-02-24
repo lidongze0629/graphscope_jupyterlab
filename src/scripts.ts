@@ -50,6 +50,7 @@ def _gs_jupyterlab_inspect_variable():
     variable_dict_list = [
         {
             'name': _v,
+            'type': "todo",
             'content': str(_gs_jupyterlab_getcontentof(eval(_v)))
         }
         for _v in values if check(_v)
