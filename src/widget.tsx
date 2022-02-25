@@ -98,10 +98,12 @@ function GSMainAreaComponent(props: {
                         )
                     }}
                 </UseSignal>
-
+                <input type="text" id="example">
+                </input>
                 <button
                     onClick={(): void => {
-                        props.widget.tempMethodForInsertCodeIntoNotebookCell("import graphscope");
+                        let a = (document.getElementById("example") as HTMLInputElement).value;
+                        props.widget.tempMethodForInsertCodeIntoNotebookCell(a);
                     }}
                 >
                     Insert code into cell
