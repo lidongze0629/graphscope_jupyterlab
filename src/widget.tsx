@@ -6,6 +6,8 @@ import { ITranslator, nullTranslator } from '@jupyterlab/translation';
 
 import { ISignal, Signal } from '@lumino/signaling';
 
+import { INotebookTracker, Notebook } from '@jupyterlab/notebook';
+
 import React from 'react';
 
 import { CommandIDs, gsIcon } from './common';
@@ -47,7 +49,6 @@ function Item(props: {
     type: string,
     content: string
 }) {
-    console.log("Item: ", props.name, props.type, props.content);
     return (
         <li>
             <span>
@@ -97,6 +98,14 @@ function GSMainAreaComponent(props: {
                         )
                     }}
                 </UseSignal>
+
+                <button
+                    onClick={(): void => {
+                        props.widget.tempMethodForInsertCodeIntoNotebookCell("import graphscope");
+                    }}
+                >
+                    Insert code into cell
+                </button>
             </div>
         </>
     )
@@ -114,6 +123,17 @@ export class GSWidget extends ReactWidget implements IVariableInspector {
         this.title.closable = true;
 
         this.translator = translator || nullTranslator;
+    }
+
+    tempMethodForInsertCodeIntoNotebookCell(code: string): void {
+        let cell = this._notebook.activeCell;
+        if (cell === null) {
+            return;
+        }
+        const notebookWidget = this._notebook.currentWidget;
+        let notebookCell = (notebookWidget.content as Notebook).activeCell;
+        const notebookCellEditor = notebookCell.editor;
+        notebookCellEditor.replaceSelection(code);
     }
 
     get handler() : VariableInspector.IInspectable | null {
@@ -138,6 +158,14 @@ export class GSWidget extends ReactWidget implements IVariableInspector {
         }
     }
 
+    get notebook(): INotebookTracker | null {
+        return this._notebook;
+    }
+
+    set notebook(nb: INotebookTracker | null) {
+        this._notebook = nb;
+    }
+
     dispose(): void {
         if (!this.isDisposed) {
             this.handler = null;
@@ -154,7 +182,6 @@ export class GSWidget extends ReactWidget implements IVariableInspector {
 
         // const title = args.title;
         this._payload = args.payload;
-        console.log("payload: ", this._payload)
         this._runningChanged.emit(void 0);
     }
 
@@ -183,6 +210,7 @@ export class GSWidget extends ReactWidget implements IVariableInspector {
     }
 
     private _handler: VariableInspector.IInspectable | null = null;
+    private _notebook: INotebookTracker | null = null;
     protected translator: ITranslator;
 
     private _payload: VariableInspector.IVariable[] = []

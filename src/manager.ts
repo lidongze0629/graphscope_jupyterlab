@@ -1,5 +1,7 @@
 import { Token } from '@lumino/coreutils';
 
+import { INotebookTracker } from '@jupyterlab/notebook';
+
 import { GSWidget } from './widget';
 
 import { VariableInspector } from './variableinspector';
@@ -12,6 +14,7 @@ export const IGSVariableManager = new Token<IGSVariableManager>(
 
 export interface IGSVariableManager {
     handler: VariableInspector.IInspectable | null;
+    notebook: INotebookTracker | null;
     hasHandler(id: string): boolean;
     addHandler(handler: VariableInspector.IInspectable): void;
     getHandler(id: string): VariableInspectionHandler;
@@ -31,6 +34,16 @@ export class GSVariableManager implements IGSVariableManager {
         if (panel && !panel.handler) {
             panel.handler = this._handler;
         }
+    }
+
+    get notebook(): INotebookTracker | null {
+        return this._notebook;
+    }
+
+    set notebook(nb: INotebookTracker | null) {
+        this._notebook = nb;
+        // set 'panel.notebook' tracker whether it's disposed or not
+        this._panel.notebook = nb;
     }
 
     public hasHandler(id: string): boolean {
@@ -65,7 +78,7 @@ export class GSVariableManager implements IGSVariableManager {
         this._handler = handler;
         if (this._handler && !this._panel.isDisposed) {
             this.panel.handler = this._handler;
-        } 
+        }
 
         // subscribe to new handler
         if (this._handler) {
@@ -79,6 +92,7 @@ export class GSVariableManager implements IGSVariableManager {
 
     // current source handler
     private _handler: VariableInspector.IInspectable | null;
+    private _notebook: INotebookTracker | null;
     private _panel: GSWidget = null;
     // each handler is either for a console or a notebook kernel
     // if a new notebook is create, build a new handler for this notebook and

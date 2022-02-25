@@ -15,6 +15,7 @@ import { GSWidget, GSSideBarWidget } from './widget';
 import { VariableInspectionHandler } from './handler';
 
 import { KernelConnector } from './kernelconnector';
+
 import { Languages } from './scripts';
 
 /**
@@ -181,6 +182,8 @@ const notebooks: JupyterFrontEndPlugin<void> = {
           if (new_handler) {
             manager.handler = new_handler;
             manager.handler.performInspection();
+            // set notebook tracker
+            manager.notebook = notebooks;
           }
         });
       });
