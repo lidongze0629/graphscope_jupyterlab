@@ -6,7 +6,9 @@ import { ITranslator, nullTranslator } from '@jupyterlab/translation';
 
 import { ISignal, Signal } from '@lumino/signaling';
 
-import { INotebookTracker, Notebook } from '@jupyterlab/notebook';
+import { INotebookTracker } from '@jupyterlab/notebook';
+
+import { CodeCell, MarkdownCell } from '@jupyterlab/cells';
 
 import React from 'react';
 
@@ -132,10 +134,11 @@ export class GSWidget extends ReactWidget implements IVariableInspector {
         if (cell === null) {
             return;
         }
-        const notebookWidget = this._notebook.currentWidget;
-        let notebookCell = (notebookWidget.content as Notebook).activeCell;
-        const notebookCellEditor = notebookCell.editor;
-        notebookCellEditor.replaceSelection(code);
+        if (cell instanceof MarkdownCell) {
+            cell.editor.replaceSelection('```' + '\n' + code + '\n```');
+        } else if(cell instanceof CodeCell) {
+            cell.editor.replaceSelection(code);
+        }
     }
 
     get handler() : VariableInspector.IInspectable | null {
