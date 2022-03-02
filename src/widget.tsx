@@ -12,7 +12,7 @@ import { CodeCell, MarkdownCell } from '@jupyterlab/cells';
 
 import React from 'react';
 
-import { CommandIDs, gsIcon } from './common';
+import { gsIcon } from './common';
 
 import { IVariableInspector, VariableInspector } from './variableinspector';
 
@@ -25,24 +25,27 @@ import { IVariableInspector, VariableInspector } from './variableinspector';
 function GSSideBarComponent(props: {
     commands: CommandRegistry,
     translator?: ITranslator;
+    widget: GSSideBarWidget,
+    signal: ISignal<GSSideBarWidget, void>,
 }) {
-    const commands = props.commands;
-    const translator = props.translator || nullTranslator;
-    const trans = translator.load('jupyterlab');
-
+    // const commands = props.commands;
+    // const translator = props.translator || nullTranslator;
+    // const trans = translator.load('jupyterlab');
     return (
         <>
             <div>
-                <button
-                    onClick={(): void => {
-                        commands.execute(trans.__(CommandIDs.open));
+                <UseSignal signal={props.signal}>
+                    {() => {
+                        return (
+                        <ListView
+                            payload={props.widget.payload}
+                        />
+                        )
                     }}
-                >
-                Graph Schema
-                </button>
+                </UseSignal>
             </div>
         </>
-    );
+    )
 }
 
 
@@ -115,10 +118,42 @@ function GSMainAreaComponent(props: {
     )
 }
 
+
+export abstract class IVariableInspectorWidget extends ReactWidget implements IVariableInspector {
+    set handler(handler: VariableInspector.IInspectable | null) {
+        if (this._handler == handler) {
+            return;
+        }
+        // remove old subscriptions
+        if (this._handler) {
+            this._handler.inspected.disconnect(this.onInspectorUpdate, this);
+            this._handler.disposed.disconnect(this.onHandlerDisposed, this);
+        }
+        this._handler = handler;
+        // subscriptions
+        if (this._handler) {
+            this._handler.inspected.connect(this.onInspectorUpdate, this);
+            this._handler.disposed.connect(this.onHandlerDisposed, this);
+            this._handler.performInspection();
+        }
+    }
+
+    get handler() : VariableInspector.IInspectable | null {
+        return this._handler;
+    }
+
+    protected abstract onInspectorUpdate(sender: any, args: VariableInspector.IVariableInspectorUpdate): void;
+
+    protected abstract onHandlerDisposed(sender: any, args: void): void;
+
+    private _handler: VariableInspector.IInspectable | null = null;
+}
+
+
 /**
  * Main area widget
  */
-export class GSWidget extends ReactWidget implements IVariableInspector {
+export class GSWidget extends IVariableInspectorWidget {
     constructor(translator?: ITranslator) {
         super();
 
@@ -138,28 +173,6 @@ export class GSWidget extends ReactWidget implements IVariableInspector {
             cell.editor.replaceSelection('```' + '\n' + code + '\n```');
         } else if(cell instanceof CodeCell) {
             cell.editor.replaceSelection(code);
-        }
-    }
-
-    get handler() : VariableInspector.IInspectable | null {
-        return this._handler;
-    }
-
-    set handler(handler: VariableInspector.IInspectable | null) {
-        if (this._handler == handler) {
-            return;
-        }
-        // remove old subscriptions
-        if (this._handler) {
-            this._handler.inspected.disconnect(this.onInspectorUpdate, this);
-            this._handler.disposed.disconnect(this.onHandlerDisposed, this);
-        }
-        this._handler = handler;
-        // subscriptions
-        if (this._handler) {
-            this._handler.inspected.connect(this.onInspectorUpdate, this);
-            this._handler.disposed.connect(this.onHandlerDisposed, this);
-            this._handler.performInspection();
         }
     }
 
@@ -214,7 +227,6 @@ export class GSWidget extends ReactWidget implements IVariableInspector {
         );
     }
 
-    private _handler: VariableInspector.IInspectable | null = null;
     private _notebook: INotebookTracker | null = null;
     protected translator: ITranslator;
 
@@ -225,7 +237,7 @@ export class GSWidget extends ReactWidget implements IVariableInspector {
 /**
  * Sidebar widget
  */
-export class GSSideBarWidget extends ReactWidget {
+export class GSSideBarWidget extends IVariableInspectorWidget {
     /**
      * Constructs a new GSSideBarWidget.
      */
@@ -234,11 +246,48 @@ export class GSSideBarWidget extends ReactWidget {
         this.commands = commands;
         this.translator = translator || nullTranslator;
 
-        this.id = "GraphScope SideBar Widget";
+        this.id = "gs-sidebar-widget";
+        this.title.caption = "GraphScope Jypyterlab Extension";
         this.title.icon = gsIcon;
         this.title.closable = true;
 
         this.addClass('jp-GSWidget');
+    }
+
+    dispose(): void {
+        if (!this.isDisposed) {
+            this.handler = null;
+            super.dispose();
+        }
+    }
+
+    /**
+     * Handle variable update signals.
+     */
+    protected onInspectorUpdate(
+        sender: any, args: VariableInspector.IVariableInspectorUpdate
+    ): void {
+        if (!this.isAttached) {
+            return;
+        }
+
+        this._payload = args.payload;
+        this._runningChanged.emit(void 0);
+    }
+
+    /**
+     * Handle handler disposed signals.
+     */
+     protected onHandlerDisposed(sender: any, args: void): void {
+        this.handler = null;
+    }
+
+    get runningChanged(): ISignal<GSSideBarWidget, void> {
+        return this._runningChanged;
+    }
+
+    get payload(): VariableInspector.IVariable[] {
+        return this._payload;
     }
 
     protected render(): JSX.Element {
@@ -246,10 +295,15 @@ export class GSSideBarWidget extends ReactWidget {
             <GSSideBarComponent
                 commands={this.commands}
                 translator={this.translator}
+                widget={this}
+                signal={this._runningChanged}
             />
         );
     }
 
     protected commands: CommandRegistry;
     protected translator: ITranslator;
+
+    private _payload: VariableInspector.IVariable[] = [];
+    private _runningChanged = new Signal<this, void>(this);
 }

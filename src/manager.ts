@@ -1,8 +1,8 @@
 import { Token } from '@lumino/coreutils';
 
-import { INotebookTracker } from '@jupyterlab/notebook';
+// import { INotebookTracker } from '@jupyterlab/notebook';
 
-import { GSWidget } from './widget';
+import { IVariableInspectorWidget } from './widget';
 
 import { VariableInspector } from './variableinspector';
 
@@ -14,37 +14,22 @@ export const IGSVariableManager = new Token<IGSVariableManager>(
 
 export interface IGSVariableManager {
     handler: VariableInspector.IInspectable | null;
-    notebook: INotebookTracker | null;
     hasHandler(id: string): boolean;
     addHandler(handler: VariableInspector.IInspectable): void;
     getHandler(id: string): VariableInspectionHandler;
 }
 
 export class GSVariableManager implements IGSVariableManager {
-    get panel(): GSWidget {
-        return this._panel;
-    }
+    // get notebook(): INotebookTracker | null {
+    //     return this._notebook;
+    // }
 
-    set panel(panel: GSWidget) {
-        if (this._panel == panel) {
-            return;
-        }
-        this._panel = panel;
-
-        if (panel && !panel.handler) {
-            panel.handler = this._handler;
-        }
-    }
-
-    get notebook(): INotebookTracker | null {
-        return this._notebook;
-    }
-
-    set notebook(nb: INotebookTracker | null) {
-        this._notebook = nb;
+    // set notebook(nb: INotebookTracker | null) {
+    //     this._notebook = nb;
         // set 'panel.notebook' tracker whether it's disposed or not
-        this._panel.notebook = nb;
-    }
+        // this._panels.array.forEach(panel => {
+        // });
+    // }
 
     public hasHandler(id: string): boolean {
         if (this._handlers[id]) {
@@ -74,10 +59,12 @@ export class GSVariableManager implements IGSVariableManager {
             this._handler.disposed.disconnect(this._onHandlerDisposed, this);
         }
         
-        // set handler to the panel
+        // set handler
         this._handler = handler;
-        if (this._handler && !this._panel.isDisposed) {
-            this.panel.handler = this._handler;
+
+        // set handler to each registered panel
+        for (let panel of this._panels.values()) {
+            panel.handler = this._handler;
         }
 
         // subscribe to new handler
@@ -86,14 +73,28 @@ export class GSVariableManager implements IGSVariableManager {
         }
     }
 
+    public getPanel(id: string) {
+        return this._panels.get(id);
+    }
+
+    public registePanel(panel: IVariableInspectorWidget): void {
+        this._panels.set(panel.id, panel);
+    }
+
     private _onHandlerDisposed(): void {
         this._handler = null;
     }
 
+    // TODO (dongze): double check whether wrapper _notebook or not.
+    // private _notebook: INotebookTracker | null;
+
+    // private _panel: GSWidget = null;
+
+    // each panel will hold current source handler which can interactive with kernel
+    private _panels = new Map<string, IVariableInspectorWidget>();
+
     // current source handler
     private _handler: VariableInspector.IInspectable | null;
-    private _notebook: INotebookTracker | null;
-    private _panel: GSWidget = null;
     // each handler is either for a console or a notebook kernel
     // if a new notebook is create, build a new handler for this notebook and
     // add to the 'handlers' collection.

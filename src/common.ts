@@ -13,17 +13,17 @@ export namespace CommandIDs {
 /**
  * Icon
  */
-const gsIcon = new LabIcon({ name: 'graphscope:icon', svgstr: graphscopeIconStr })
+const gsIcon = new LabIcon({ name: 'graphscope:icon', svgstr: graphscopeIconStr });
 export { gsIcon };
 
 /**
  * Palette Category
  */
-const PALETTE_CATEGORY = "graphscope"
+const PALETTE_CATEGORY = "graphscope";
 export { PALETTE_CATEGORY };
 
 /**
  * Namespace
  */
-const NAMESPACE = "graphscope"
+const NAMESPACE = "graphscope";
 export { NAMESPACE };
