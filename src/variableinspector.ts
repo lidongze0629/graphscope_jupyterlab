@@ -28,6 +28,10 @@ export namespace VariableInspector {
         name: string;
         type: string;
         content: string;
+        props: {
+            session_id: string,
+            state: string,
+        }
         size?: string;
         shape?: string; // Shape currently reserved for tensor/dataframe.
     }

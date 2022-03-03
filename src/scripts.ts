@@ -36,26 +36,53 @@ def _gs_jupyterlab_getcontentof(x):
     else:
         return content
 
-# inspect all variables and select 'graphscope.Graph' in current kernel 
 def _gs_jupyterlab_inspect_variable():
-    def check(v):
-        try:    
-            obj = eval(v)
+    if 'graphscope' not in sys.modules:
+        return ""
+
+    def _is_gs_session(v):
+        if isinstance(v, graphscope.Session):
             return True
-        except:
-            return False
+        return False
+
+    def _is_gs_graph(v):
+        # if isinstance(v, graphscope.Graph) or isinstance(v, graphscope.nx.Graph):
+        if isinstance(v, graphscope.Graph):
+            return True
+        return False
+
+    def _belongs_to_gs(_v):
+        v = eval(_v)
+        if _is_gs_session(v) or _is_gs_graph(v):
+            return True
+        return False
+
+    def _parse(_v):
+        v = eval(_v)
+        rlt = {
+            "name": _v,
+            "content": str(_gs_jupyterlab_getcontentof(v)),
+        }
+
+        if _is_gs_session(v):
+            rlt["type"] = "session"
+            rlt["props"] = {
+                "session_id": v.session_id,
+                "state": v.info["status"],
+            }
+        elif _is_gs_graph(v):
+            rlt["type"] = "graph"
+            rlt["props"] = {
+                "session_id": v.session_id,
+                "state": str(v.loaded()),
+            }
+        return rlt
 
     values = _gs_jupyterlab_nms.who_ls()
-    # TODO(dongze) select variable which instanceof 'graphscope.Graph'
-    variable_dict_list = [
-        {
-            'name': _v,
-            'type': "todo",
-            'content': str(_gs_jupyterlab_getcontentof(eval(_v)))
-        }
-        for _v in values if check(_v)
+    gs_variable_dict_list = [
+        _parse(_v) for _v in values if _belongs_to_gs(_v)
     ]
-    return json.dumps(variable_dict_list)
+    return json.dumps(gs_variable_dict_list)
 
 def _gs_jupyterlab_delete_variable(x):
     exec("del %s" % x, globals())

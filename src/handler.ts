@@ -117,15 +117,20 @@ export class VariableInspectionHandler implements IDisposable, VariableInspector
                     content = content.slice(1, -1);
                     content = content.replace(/\\"/g, '"').replace(/\\'/g, "'");
                 }
-                const update = JSON.parse(content) as VariableInspector.IVariable[];
                 const title = {
                     kernelName: this._connector.kernelName || '',
                     contextName: '',
                 }
-                this._inspected.emit({
-                    title: title, payload: update
-                } as VariableInspector.IVariableInspectorUpdate );
-
+                if (!content) {
+                    this._inspected.emit({
+                        title: title, payload: []
+                    } as VariableInspector.IVariableInspectorUpdate );
+                } else {
+                    const update = JSON.parse(content) as VariableInspector.IVariable[];
+                    this._inspected.emit({
+                        title: title, payload: update
+                    } as VariableInspector.IVariableInspectorUpdate );
+                }
                 break;
             }
             default:

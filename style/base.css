@@ -9,3 +9,22 @@
    * relative to this base size */
   font-size: var(--jp-ui-font-size1);
 }
+
+
+.msg {
+  text-align: right;
+  color: orange;
+}
+
+.container-fluid .wj-treeview {
+  display: flex;
+  font-size: 120%;
+  margin-bottom: 8px;
+  padding: 6px;
+  background: var(--jp-layout-color1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+body {
+  margin-bottom: 24pt;
+}

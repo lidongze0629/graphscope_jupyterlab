@@ -16,12 +16,103 @@ import { gsIcon } from './common';
 
 import { IVariableInspector, VariableInspector } from './variableinspector';
 
+import '@grapecity/wijmo.styles/wijmo.css';
+
+import 'bootstrap/dist/css/bootstrap.css';
+
+import * as wjNav from '@grapecity/wijmo.react.nav';
+
+export function getData() {
+    return [
+        {
+            header: 'Electronics', img: 'resources/electronics.png', items: [
+                { header: 'Trimmers/Shavers' },
+                { header: 'Tablets' },
+                {
+                    header: 'Phones', img: 'resources/phones.png', items: [
+                        { header: 'Apple' },
+                        { header: 'Motorola', newItem: true },
+                        { header: 'Nokia' },
+                        { header: 'Samsung' }
+                    ]
+                },
+                { header: 'Speakers', newItem: true },
+                { header: 'Monitors' }
+            ]
+        },
+        {
+            header: 'Toys', img: 'resources/toys.png', items: [
+                { header: 'Shopkins' },
+                { header: 'Train Sets' },
+                { header: 'Science Kit', newItem: true },
+                { header: 'Play-Doh' },
+                { header: 'Crayola' }
+            ]
+        },
+        {
+            header: 'Home', img: 'resources/home.png', items: [
+                { header: 'Coffee Maker' },
+                { header: 'Breadmaker', newItem: true },
+                { header: 'Solar Panel', newItem: true },
+                { header: 'Work Table' },
+                { header: 'Propane Grill' }
+            ]
+        }
+    ];
+}
+
+interface GSGraphVariable {
+    header: string
+}
+
+interface GSSessionVariable {
+    header: string,
+    items: GSGraphVariable[],
+}
+
+interface IProperties {
+    commands: CommandRegistry,
+    translator?: ITranslator;
+    widget: GSSideBarWidget,
+    signal: ISignal<GSSideBarWidget, void>,
+}
+
+interface IState {
+    data: any,
+    msg: string,
+}
+
+
+class GSSideBarComponent extends React.Component<IProperties, IState> {
+    constructor(props: IProperties) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <UseSignal signal={this.props.signal}>
+            {() => {
+                return (
+                    <div className="container-fluid">
+                        <wjNav.TreeView itemsSource={ this.props.widget.payload } displayMemberPath="header" childItemsPath="items" itemClicked={this.onItemClicked.bind(this)}></wjNav.TreeView>
+                    </div>
+                )
+            }}
+            </UseSignal>
+        );
+    }
+
+    public onItemClicked(s: any, e: any) {
+        console.log(s.selectedItem.header);
+    }
+}
 
 /**
  * Sidebar react component
  * 
  * @return The react component
  */
+/*
 function GSSideBarComponent(props: {
     commands: CommandRegistry,
     translator?: ITranslator;
@@ -47,7 +138,7 @@ function GSSideBarComponent(props: {
         </>
     )
 }
-
+**/
 
 function Item(props: {
     name: string,
@@ -271,7 +362,32 @@ export class GSSideBarWidget extends IVariableInspectorWidget {
             return;
         }
 
-        this._payload = args.payload;
+        let sessions = new Map<string, GSSessionVariable>();
+
+        // handle `session`
+        args.payload.forEach(v => {
+            if (v.type === "session") {
+                sessions.set(v.props.session_id, { "header": v.name, "items": [] });
+            }
+        });
+
+        // handle `graph`
+        args.payload.forEach(v => {
+            if (v.type === "graph") {
+                let session_id = v.props.session_id;
+                if (!sessions.has(session_id)) {
+                    sessions.set(session_id, { "header": "Default Session", items: []});
+                }
+                let session = sessions.get(session_id);
+                session.items.push({ header: v.name });
+            }
+        });
+
+        this._payload = [];
+        for (let value of sessions.values()) {
+            this._payload.push(value);
+        }
+
         this._runningChanged.emit(void 0);
     }
 
@@ -286,7 +402,7 @@ export class GSSideBarWidget extends IVariableInspectorWidget {
         return this._runningChanged;
     }
 
-    get payload(): VariableInspector.IVariable[] {
+    get payload() {
         return this._payload;
     }
 
@@ -298,12 +414,14 @@ export class GSSideBarWidget extends IVariableInspectorWidget {
                 widget={this}
                 signal={this._runningChanged}
             />
-        );
+        )
+
     }
 
     protected commands: CommandRegistry;
     protected translator: ITranslator;
 
-    private _payload: VariableInspector.IVariable[] = [];
+    private _payload: any;
+    // private _payload: VariableInspector.IVariable[] = [];
     private _runningChanged = new Signal<this, void>(this);
 }

@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/Cellar/node/17.0.1/bin/node /Users/lidongze/Library/Python/3.9/lib/python/site-packages/jupyterlab/staging/yarn.js run build
+  /usr/local/Cellar/node/17.0.1/bin/node /Users/lidongze/Library/Python/3.9/lib/python/site-packages/jupyterlab/staging/yarn.js add @grapecity/wijmo.styles/wijmo.css
 
 PATH: 
   /Users/lidongze/Library/Python/3.9/bin:/Users/lidongze/.gem/ruby/2.6.0/bin:/usr/local/opt/gnu-tar/libexec/gnubin:/usr/local/opt/ruby/bin:/Users/lidongze/.pyenv/bin:/usr/local/opt/openjdk/bin:/usr/local/bin:/usr/local/bin:/usr/local/sbin:/Users/lidongze/.pyenv/shims:/Users/lidongze/.pyenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/lidongze/Library/Python/3.9/bin:/Users/lidongze/.gem/ruby/2.6.0/bin:/usr/local/opt/gnu-tar/libexec/gnubin:/usr/local/opt/ruby/bin:/Users/lidongze/.pyenv/bin:/usr/local/opt/openjdk/bin:/usr/local/sbin:/Users/lidongze/.pyenv/shims:/Users/lidongze/.cargo/bin
@@ -14,12 +14,17 @@ Platform:
   darwin x64
 
 Trace: 
-  SyntaxError: /Users/lidongze/alibaba/jupyterlab/labextensions/graphscope_jupyterlab/package.json: Unexpected token ] in JSON at position 2306
-      at JSON.parse (<anonymous>)
-      at /Users/lidongze/Library/Python/3.9/lib/python/site-packages/jupyterlab/staging/yarn.js:1098:57
-      at Generator.next (<anonymous>)
-      at step (/Users/lidongze/Library/Python/3.9/lib/python/site-packages/jupyterlab/staging/yarn.js:310:30)
-      at /Users/lidongze/Library/Python/3.9/lib/python/site-packages/jupyterlab/staging/yarn.js:321:13
+  Error: https://registry.yarnpkg.com/@grapecity%2fwijmo.styles/wijmo.css: Request "https://registry.yarnpkg.com/@grapecity%2fwijmo.styles/wijmo.css" returned a 405
+      at Request.params.callback [as _callback] (/Users/lidongze/Library/Python/3.9/lib/python/site-packages/jupyterlab/staging/yarn.js:78486:18)
+      at Request.self.callback (/Users/lidongze/Library/Python/3.9/lib/python/site-packages/jupyterlab/staging/yarn.js:135083:22)
+      at Request.emit (node:events:390:28)
+      at Request.<anonymous> (/Users/lidongze/Library/Python/3.9/lib/python/site-packages/jupyterlab/staging/yarn.js:136055:10)
+      at Request.emit (node:events:390:28)
+      at IncomingMessage.<anonymous> (/Users/lidongze/Library/Python/3.9/lib/python/site-packages/jupyterlab/staging/yarn.js:135977:12)
+      at Object.onceWrapper (node:events:509:28)
+      at IncomingMessage.emit (node:events:402:35)
+      at endReadableNT (node:internal/streams/readable:1340:12)
+      at processTicksAndRejections (node:internal/process/task_queues:83:21)
 
 npm manifest: 
   {
@@ -69,10 +74,16 @@ npm manifest:
       "watch:labextension": "jupyter labextension watch ."
     },
     "dependencies": {
+      "@grapecity/wijmo.react.nav": "^5.20213.834",
       "@jupyterlab/application": "^3.1.0",
+      "@jupyterlab/cells": "^3.2.9",
+      "@jupyterlab/inspector": "^3.2.9",
       "@jupyterlab/launcher": "^3.2.9",
+      "@jupyterlab/notebook": "^3.2.9",
       "@jupyterlab/translation": "^3.2.9",
-      "@jupyterlab/ui-components": "^3.2.9"
+      "@jupyterlab/ui-components": "^3.2.9",
+      "@lumino/coreutils": "^1.12.0",
+      "@lumino/widgets": "^1.31.1"
     },
     "devDependencies": {
       "@jupyterlab/builder": "^3.1.0",
@@ -89,7 +100,7 @@ npm manifest:
     "sideEffects": [
       "style/*.css",
       "style/index.js",
-      "style/*.svg",
+      "style/*.svg"
     ],
     "styleModule": "style/index.js",
     "publishConfig": {
@@ -218,6 +229,41 @@ Lockfile:
     resolved "https://registry.npmjs.org/@gar/promisify/-/promisify-1.1.3.tgz"
     integrity sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==
   
+  "@grapecity/wijmo.nav@5.20213.834":
+    version "5.20213.834"
+    resolved "https://registry.yarnpkg.com/@grapecity/wijmo.nav/-/wijmo.nav-5.20213.834.tgz#9506dfd7a90ba83e2d0a85497596fb53307e1175"
+    integrity sha512-eZ9W59LqEeK5rNT9iEkJgV5etpZZ9MrozIB+2+Nav4/hLoObOUVgPr2UH7LgzSufmJj2DI7sm3VBgCjZVRrGtg==
+    dependencies:
+      "@grapecity/wijmo" "5.20213.834"
+  
+  "@grapecity/wijmo.react.base@5.20213.834":
+    version "5.20213.834"
+    resolved "https://registry.yarnpkg.com/@grapecity/wijmo.react.base/-/wijmo.react.base-5.20213.834.tgz#b8b8467f8a4db5d473a09e98b3eba30f514fb9e2"
+    integrity sha512-+KoXLAj+YqEyrE6WxT37EfHxjHIs3gfWuzxE0V+1l6c6KhknruY94kswFoUzbFPYIee1RDVZsIfx/mpiepX7gQ==
+    dependencies:
+      "@grapecity/wijmo" "5.20213.834"
+  
+  "@grapecity/wijmo.react.nav@^5.20213.834":
+    version "5.20213.834"
+    resolved "https://registry.yarnpkg.com/@grapecity/wijmo.react.nav/-/wijmo.react.nav-5.20213.834.tgz#665c7884536fafa171b4e1d23affa55bbc1aeafe"
+    integrity sha512-KwW6Rza7yH9h5IdWfo+QVgt1bqfmduNogD7V1JJwoIXT2aVMlY5L/Gn7BBE262y/c6mTMV4aN3RuPyy+JSN/sw==
+    dependencies:
+      "@grapecity/wijmo" "5.20213.834"
+      "@grapecity/wijmo.nav" "5.20213.834"
+      "@grapecity/wijmo.react.base" "5.20213.834"
+  
+  "@grapecity/wijmo.styles@5.20213.834":
+    version "5.20213.834"
+    resolved "https://registry.yarnpkg.com/@grapecity/wijmo.styles/-/wijmo.styles-5.20213.834.tgz#9bf3f4e3f64d62fb32b79af08899eafb7d3d52b4"
+    integrity sha512-58xY2DVm9kDHw/HRKGPyx6+MPO1UKScgUdnRHhjdM4DmNCTiJ4+TUulHrdXmUg4bbpZgzaTdIy4sxYbEM63oCQ==
+  
+  "@grapecity/wijmo@5.20213.834":
+    version "5.20213.834"
+    resolved "https://registry.yarnpkg.com/@grapecity/wijmo/-/wijmo-5.20213.834.tgz#ede7437f0a655045058c778dee6e663dcd1c80e6"
+    integrity sha512-AcKEfWIT/GgfjOyjaUeJhiZ/NlaogTAgnNB76NsLW8SyxYAX6sj0EITVr8TyghQem4fRSnJaG9KIn+22BbqxOA==
+    dependencies:
+      "@grapecity/wijmo.styles" "5.20213.834"
+  
   "@humanwhocodes/config-array@^0.5.0":
     version "0.5.0"
     resolved "https://registry.npmjs.org/@humanwhocodes/config-array/-/config-array-0.5.0.tgz"
@@ -294,6 +340,18 @@ Lockfile:
       sanitize-html "~2.5.3"
       url "^0.11.0"
   
+  "@jupyterlab/attachments@^3.2.9":
+    version "3.2.9"
+    resolved "https://registry.yarnpkg.com/@jupyterlab/attachments/-/attachments-3.2.9.tgz#e295369a589d5f67a3d41ed83e1517a9787fc3e1"
+    integrity sha512-M17QpbNjM17w3UBhC1b/4H9gATnERnb6jnQj+4i5v2UItoKpHCYYqRBZEte9f2bYhhHu2BsOOVy37aX5/M66Cw==
+    dependencies:
+      "@jupyterlab/nbformat" "^3.2.9"
+      "@jupyterlab/observables" "^4.2.9"
+      "@jupyterlab/rendermime" "^3.2.9"
+      "@jupyterlab/rendermime-interfaces" "^3.2.9"
+      "@lumino/disposable" "^1.4.3"
+      "@lumino/signaling" "^1.4.3"
+  
   "@jupyterlab/builder@^3.1.0":
     version "3.2.9"
     resolved "https://registry.npmjs.org/@jupyterlab/builder/-/builder-3.2.9.tgz"
@@ -359,6 +417,35 @@ Lockfile:
       typescript "~4.1.3"
       verdaccio "^5.1.1"
   
+  "@jupyterlab/cells@^3.2.9":
+    version "3.2.9"
+    resolved "https://registry.yarnpkg.com/@jupyterlab/cells/-/cells-3.2.9.tgz#53f95bf14bd90e0af8607bb50ce2a4b5da0220b8"
+    integrity sha512-gRpzNUAi3F8D1zjMXu+I2NPbsQ87UuSo6x1lJvhWqoDIb4jUS1RPqf0/z97kTvOwp7MgEX8XVTpDSwVu0OiGHA==
+    dependencies:
+      "@jupyterlab/apputils" "^3.2.9"
+      "@jupyterlab/attachments" "^3.2.9"
+      "@jupyterlab/codeeditor" "^3.2.9"
+      "@jupyterlab/codemirror" "^3.2.9"
+      "@jupyterlab/coreutils" "^5.2.9"
+      "@jupyterlab/filebrowser" "^3.2.9"
+      "@jupyterlab/nbformat" "^3.2.9"
+      "@jupyterlab/observables" "^4.2.9"
+      "@jupyterlab/outputarea" "^3.2.9"
+      "@jupyterlab/rendermime" "^3.2.9"
+      "@jupyterlab/services" "^6.2.9"
+      "@jupyterlab/shared-models" "^3.2.9"
+      "@jupyterlab/ui-components" "^3.2.9"
+      "@lumino/algorithm" "^1.3.3"
+      "@lumino/coreutils" "^1.5.3"
+      "@lumino/domutils" "^1.2.3"
+      "@lumino/dragdrop" "^1.7.1"
+      "@lumino/messaging" "^1.4.3"
+      "@lumino/signaling" "^1.4.3"
+      "@lumino/virtualdom" "^1.8.0"
+      "@lumino/widgets" "^1.19.0"
+      marked "^2.0.0"
+      react "^17.0.1"
+  
   "@jupyterlab/codeeditor@^3.2.9":
     version "3.2.9"
     resolved "https://registry.npmjs.org/@jupyterlab/codeeditor/-/codeeditor-3.2.9.tgz"
@@ -414,6 +501,27 @@ Lockfile:
       path-browserify "^1.0.0"
       url-parse "~1.5.1"
   
+  "@jupyterlab/docmanager@^3.2.9":
+    version "3.2.9"
+    resolved "https://registry.yarnpkg.com/@jupyterlab/docmanager/-/docmanager-3.2.9.tgz#c46331ac24c788776bc68463a7f7233f6d36c245"
+    integrity sha512-K+Oh/DGe6gosdXAqaGow8JHRLX9EPP72Wb+qjMz+a4GiyNE2zTlfqVYWbhEQrD5ZL0kqAHWfkYTxY+xPY5wMzg==
+    dependencies:
+      "@jupyterlab/apputils" "^3.2.9"
+      "@jupyterlab/coreutils" "^5.2.9"
+      "@jupyterlab/docprovider" "^3.2.9"
+      "@jupyterlab/docregistry" "^3.2.9"
+      "@jupyterlab/services" "^6.2.9"
+      "@jupyterlab/statusbar" "^3.2.9"
+      "@jupyterlab/translation" "^3.2.9"
+      "@lumino/algorithm" "^1.3.3"
+      "@lumino/coreutils" "^1.5.3"
+      "@lumino/disposable" "^1.4.3"
+      "@lumino/messaging" "^1.4.3"
+      "@lumino/properties" "^1.2.3"
+      "@lumino/signaling" "^1.4.3"
+      "@lumino/widgets" "^1.19.0"
+      react "^17.0.1"
+  
   "@jupyterlab/docprovider@^3.2.9":
     version "3.2.9"
     resolved "https://registry.npmjs.org/@jupyterlab/docprovider/-/docprovider-3.2.9.tgz"
@@ -450,6 +558,50 @@ Lockfile:
       "@lumino/widgets" "^1.19.0"
       yjs "^13.5.17"
   
+  "@jupyterlab/filebrowser@^3.2.9":
+    version "3.2.9"
+    resolved "https://registry.yarnpkg.com/@jupyterlab/filebrowser/-/filebrowser-3.2.9.tgz#78b4a1489f6f086a716dec140f127505939b4e1d"
+    integrity sha512-HeTvzwbg8Mv9sZob9FnJsdCVLe783eJde+HilpTlJXm/lAnzqf32m0Zpkl6aTGezpowhl97rgOCzfNy063mwLg==
+    dependencies:
+      "@jupyterlab/apputils" "^3.2.9"
+      "@jupyterlab/coreutils" "^5.2.9"
+      "@jupyterlab/docmanager" "^3.2.9"
+      "@jupyterlab/docregistry" "^3.2.9"
+      "@jupyterlab/services" "^6.2.9"
+      "@jupyterlab/statedb" "^3.2.9"
+      "@jupyterlab/statusbar" "^3.2.9"
+      "@jupyterlab/translation" "^3.2.9"
+      "@jupyterlab/ui-components" "^3.2.9"
+      "@lumino/algorithm" "^1.3.3"
+      "@lumino/coreutils" "^1.5.3"
+      "@lumino/disposable" "^1.4.3"
+      "@lumino/domutils" "^1.2.3"
+      "@lumino/dragdrop" "^1.7.1"
+      "@lumino/messaging" "^1.4.3"
+      "@lumino/polling" "^1.3.3"
+      "@lumino/signaling" "^1.4.3"
+      "@lumino/virtualdom" "^1.8.0"
+      "@lumino/widgets" "^1.19.0"
+      react "^17.0.1"
+  
+  "@jupyterlab/inspector@^3.2.9":
+    version "3.2.9"
+    resolved "https://registry.yarnpkg.com/@jupyterlab/inspector/-/inspector-3.2.9.tgz#e701ed2c7a2da70df784a8a68ce8a44a2db29601"
+    integrity sha512-vG5d3Htu0yjXhLlj/ggd8wYy61ksJINf+0mpEEbc6D0X0JiaFQyH5uNzcPd5nDPdTPsrRAw9qYpyexl0BQj8mg==
+    dependencies:
+      "@jupyterlab/apputils" "^3.2.9"
+      "@jupyterlab/codeeditor" "^3.2.9"
+      "@jupyterlab/coreutils" "^5.2.9"
+      "@jupyterlab/rendermime" "^3.2.9"
+      "@jupyterlab/services" "^6.2.9"
+      "@jupyterlab/statedb" "^3.2.9"
+      "@jupyterlab/translation" "^3.2.9"
+      "@lumino/coreutils" "^1.5.3"
+      "@lumino/disposable" "^1.4.3"
+      "@lumino/polling" "^1.3.3"
+      "@lumino/signaling" "^1.4.3"
+      "@lumino/widgets" "^1.19.0"
+  
   "@jupyterlab/launcher@^3.2.9":
     version "3.2.9"
     resolved "https://registry.npmjs.org/@jupyterlab/launcher/-/launcher-3.2.9.tgz"
@@ -473,6 +625,35 @@ Lockfile:
     dependencies:
       "@lumino/coreutils" "^1.5.3"
   
+  "@jupyterlab/notebook@^3.2.9":
+    version "3.2.9"
+    resolved "https://registry.yarnpkg.com/@jupyterlab/notebook/-/notebook-3.2.9.tgz#5bf0d069636fc5303d7e42579a49dd0f804a5e11"
+    integrity sha512-PzsosdFIHJY6KJPGUWSnGYNuMeXeTiOOo4hTJr+Hk8e7+aj7us9rD6C+/uE4NbMrjPpAk/bDlVCQ0XwEKYtqHA==
+    dependencies:
+      "@jupyterlab/apputils" "^3.2.9"
+      "@jupyterlab/cells" "^3.2.9"
+      "@jupyterlab/codeeditor" "^3.2.9"
+      "@jupyterlab/coreutils" "^5.2.9"
+      "@jupyterlab/docregistry" "^3.2.9"
+      "@jupyterlab/nbformat" "^3.2.9"
+      "@jupyterlab/observables" "^4.2.9"
+      "@jupyterlab/rendermime" "^3.2.9"
+      "@jupyterlab/services" "^6.2.9"
+      "@jupyterlab/shared-models" "^3.2.9"
+      "@jupyterlab/statusbar" "^3.2.9"
+      "@jupyterlab/translation" "^3.2.9"
+      "@jupyterlab/ui-components" "^3.2.9"
+      "@lumino/algorithm" "^1.3.3"
+      "@lumino/coreutils" "^1.5.3"
+      "@lumino/domutils" "^1.2.3"
+      "@lumino/dragdrop" "^1.7.1"
+      "@lumino/messaging" "^1.4.3"
+      "@lumino/properties" "^1.2.3"
+      "@lumino/signaling" "^1.4.3"
+      "@lumino/virtualdom" "^1.8.0"
+      "@lumino/widgets" "^1.19.0"
+      react "^17.0.1"
+  
   "@jupyterlab/observables@^4.2.9":
     version "4.2.9"
     resolved "https://registry.npmjs.org/@jupyterlab/observables/-/observables-4.2.9.tgz"
@@ -483,6 +664,26 @@ Lockfile:
       "@lumino/disposable" "^1.4.3"
       "@lumino/messaging" "^1.4.3"
       "@lumino/signaling" "^1.4.3"
+  
+  "@jupyterlab/outputarea@^3.2.9":
+    version "3.2.9"
+    resolved "https://registry.yarnpkg.com/@jupyterlab/outputarea/-/outputarea-3.2.9.tgz#c3f0d8fb394aa7c26977f506bebf9ad9850ee732"
+    integrity sha512-zFgk4a7LxMSSTtxnL7YDHXhdTG7x8wb63Nxd0iHasEgQLpayGEXkt/4V4FwmFM/Z3pIGa1W6syfZ5sFYUMA5Nw==
+    dependencies:
+      "@jupyterlab/apputils" "^3.2.9"
+      "@jupyterlab/nbformat" "^3.2.9"
+      "@jupyterlab/observables" "^4.2.9"
+      "@jupyterlab/rendermime" "^3.2.9"
+      "@jupyterlab/rendermime-interfaces" "^3.2.9"
+      "@jupyterlab/services" "^6.2.9"
+      "@lumino/algorithm" "^1.3.3"
+      "@lumino/coreutils" "^1.5.3"
+      "@lumino/disposable" "^1.4.3"
+      "@lumino/messaging" "^1.4.3"
+      "@lumino/properties" "^1.2.3"
+      "@lumino/signaling" "^1.4.3"
+      "@lumino/widgets" "^1.19.0"
+      resize-observer-polyfill "^1.5.1"
   
   "@jupyterlab/rendermime-interfaces@^3.2.9":
     version "3.2.9"
@@ -590,7 +791,7 @@ Lockfile:
   
   "@jupyterlab/translation@^3.2.9":
     version "3.2.9"
-    resolved "https://registry.yarnpkg.com/@jupyterlab/translation/-/translation-3.2.9.tgz#3e7532a4072bbc27e0f01e6601263de8f7cea9db"
+    resolved "https://registry.npmjs.org/@jupyterlab/translation/-/translation-3.2.9.tgz"
     integrity sha512-Pjs8PScBmgcHFh56Ceu0Fsay9vP+gLgQSB/ZkhD9ef1lg2j3WGoOV1sYpjbf9rl3+j0qbJSAiO/X/lYuj0+tGw==
     dependencies:
       "@jupyterlab/coreutils" "^5.2.9"
@@ -600,7 +801,7 @@ Lockfile:
   
   "@jupyterlab/ui-components@^3.2.9":
     version "3.2.9"
-    resolved "https://registry.yarnpkg.com/@jupyterlab/ui-components/-/ui-components-3.2.9.tgz#87450b87d1ea6c0e9092f759fd3b43b5f29abc9d"
+    resolved "https://registry.npmjs.org/@jupyterlab/ui-components/-/ui-components-3.2.9.tgz"
     integrity sha512-mhmBwMsvZiiWCwZhI1c/6BZqvdVJjU6bSvjrkHOuJxGS/wVBvs05FO/BXZql/3uC21Cqndnh4q4cWgaAiHUgYw==
     dependencies:
       "@blueprintjs/core" "^3.36.0"

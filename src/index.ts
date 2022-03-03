@@ -26,15 +26,15 @@ import { Languages } from './scripts';
 const variableinspector: JupyterFrontEndPlugin<IGSVariableManager> = {
   id: '@graphscope/variableinspector',
   autoStart: true,
-  requires: [ILabShell, ILayoutRestorer, ITranslator],
-  optional: [ICommandPalette],
+  requires: [ILabShell, ITranslator],
+  optional: [ICommandPalette, ILayoutRestorer],
   provides: IGSVariableManager,
   activate: (
     app: JupyterFrontEnd,
     labShell: ILabShell,
-    restorer: ILayoutRestorer,
     translator: ITranslator,
     palette: ICommandPalette | null,
+    restorer: ILayoutRestorer | null,
   ): IGSVariableManager => {
     const { commands } = app;
 
@@ -44,6 +44,12 @@ const variableinspector: JupyterFrontEndPlugin<IGSVariableManager> = {
     // rank(501-899): reserved for third-party extensions.
     const gsSideBarWidget = new GSSideBarWidget(commands);
     labShell.add(gsSideBarWidget, 'left', { rank: 501 });
+
+
+    if (restorer) {
+      // Add the sidebar to the application restorer
+      restorer.add(gsSideBarWidget, '@graphscope/sidebar:plugin');
+    }
 
     manager.registePanel(gsSideBarWidget);
     return manager;

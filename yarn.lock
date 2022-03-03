@@ -100,6 +100,41 @@
   resolved "https://registry.npmjs.org/@gar/promisify/-/promisify-1.1.3.tgz"
   integrity sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==
 
+"@grapecity/wijmo.nav@5.20213.834":
+  version "5.20213.834"
+  resolved "https://registry.yarnpkg.com/@grapecity/wijmo.nav/-/wijmo.nav-5.20213.834.tgz#9506dfd7a90ba83e2d0a85497596fb53307e1175"
+  integrity sha512-eZ9W59LqEeK5rNT9iEkJgV5etpZZ9MrozIB+2+Nav4/hLoObOUVgPr2UH7LgzSufmJj2DI7sm3VBgCjZVRrGtg==
+  dependencies:
+    "@grapecity/wijmo" "5.20213.834"
+
+"@grapecity/wijmo.react.base@5.20213.834":
+  version "5.20213.834"
+  resolved "https://registry.yarnpkg.com/@grapecity/wijmo.react.base/-/wijmo.react.base-5.20213.834.tgz#b8b8467f8a4db5d473a09e98b3eba30f514fb9e2"
+  integrity sha512-+KoXLAj+YqEyrE6WxT37EfHxjHIs3gfWuzxE0V+1l6c6KhknruY94kswFoUzbFPYIee1RDVZsIfx/mpiepX7gQ==
+  dependencies:
+    "@grapecity/wijmo" "5.20213.834"
+
+"@grapecity/wijmo.react.nav@^5.20213.834":
+  version "5.20213.834"
+  resolved "https://registry.yarnpkg.com/@grapecity/wijmo.react.nav/-/wijmo.react.nav-5.20213.834.tgz#665c7884536fafa171b4e1d23affa55bbc1aeafe"
+  integrity sha512-KwW6Rza7yH9h5IdWfo+QVgt1bqfmduNogD7V1JJwoIXT2aVMlY5L/Gn7BBE262y/c6mTMV4aN3RuPyy+JSN/sw==
+  dependencies:
+    "@grapecity/wijmo" "5.20213.834"
+    "@grapecity/wijmo.nav" "5.20213.834"
+    "@grapecity/wijmo.react.base" "5.20213.834"
+
+"@grapecity/wijmo.styles@5.20213.834":
+  version "5.20213.834"
+  resolved "https://registry.yarnpkg.com/@grapecity/wijmo.styles/-/wijmo.styles-5.20213.834.tgz#9bf3f4e3f64d62fb32b79af08899eafb7d3d52b4"
+  integrity sha512-58xY2DVm9kDHw/HRKGPyx6+MPO1UKScgUdnRHhjdM4DmNCTiJ4+TUulHrdXmUg4bbpZgzaTdIy4sxYbEM63oCQ==
+
+"@grapecity/wijmo@5.20213.834":
+  version "5.20213.834"
+  resolved "https://registry.yarnpkg.com/@grapecity/wijmo/-/wijmo-5.20213.834.tgz#ede7437f0a655045058c778dee6e663dcd1c80e6"
+  integrity sha512-AcKEfWIT/GgfjOyjaUeJhiZ/NlaogTAgnNB76NsLW8SyxYAX6sj0EITVr8TyghQem4fRSnJaG9KIn+22BbqxOA==
+  dependencies:
+    "@grapecity/wijmo.styles" "5.20213.834"
+
 "@humanwhocodes/config-array@^0.5.0":
   version "0.5.0"
   resolved "https://registry.npmjs.org/@humanwhocodes/config-array/-/config-array-0.5.0.tgz"
@@ -1441,6 +1476,11 @@ body-parser@1.19.1:
     qs "6.9.6"
     raw-body "2.4.2"
     type-is "~1.6.18"
+
+bootstrap@^5.1.3:
+  version "5.1.3"
+  resolved "https://registry.yarnpkg.com/bootstrap/-/bootstrap-5.1.3.tgz#ba081b0c130f810fa70900acbc1c6d3c28fa8f34"
+  integrity sha512-fcQztozJ8jToQWXxVuEyXWW+dSo8AiXWKwiSSrKWsRB/Qt+Ewwza+JWoLKiTuQLaEPhdNAJ7+Dosc9DOIqNy7Q==
 
 brace-expansion@^1.1.7:
   version "1.1.11"
