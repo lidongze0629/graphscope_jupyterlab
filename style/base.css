@@ -9,3 +9,30 @@
    * relative to this base size */
   font-size: var(--jp-ui-font-size1);
 }
+
+.jp-GSSideBarContents {
+  display: flex;
+  flex-direction: column;
+  background: var(--jp-layout-color1);
+  color: var(--jp-ui-font-color1);
+  font-size: var(--jp-ui-font-size1);
+  height: 100%;
+}
+
+.jp-GSSideBarContents .jp-stack-panel-header {
+  border-bottom: var(--jp-border-width) solid var(--jp-border-color2);
+  flex: 0 0 auto;
+  font-size: var(--jp-ui-font-size0);
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin: 0;
+  padding: 8px 12px;
+  text-transform: uppercase;
+}
+
+.jp-stack-pannel-icon-header {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}

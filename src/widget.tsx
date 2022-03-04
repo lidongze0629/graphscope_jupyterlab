@@ -1,4 +1,4 @@
-import { ReactWidget, UseSignal } from '@jupyterlab/apputils';
+import { ReactWidget, UseSignal  } from '@jupyterlab/apputils';
 
 import { CommandRegistry } from '@lumino/commands';
 
@@ -90,15 +90,22 @@ class GSSideBarComponent extends React.Component<IProperties, IState> {
 
     render() {
         return (
-            <UseSignal signal={this.props.signal}>
-            {() => {
-                return (
-                    <div className="container-fluid">
-                        <wjNav.TreeView itemsSource={ this.props.widget.payload } displayMemberPath="header" childItemsPath="items" itemClicked={this.onItemClicked.bind(this)}></wjNav.TreeView>
-                    </div>
-                )
-            }}
-            </UseSignal>
+            <div className="jp-GSSideBarContents">
+                <div className="jp-stack-panel-header">
+                    <span>List of Resources</span>
+                </div>
+
+                <UseSignal signal={this.props.signal}>
+                {() => {
+                    return (
+                        <div className="container-fluid">
+                            <wjNav.TreeView itemsSource={ this.props.widget.payload } displayMemberPath="header" childItemsPath="items" itemClicked={this.onItemClicked.bind(this)}></wjNav.TreeView>
+                        </div>
+                    )
+                }}
+                </UseSignal>
+
+            </div>
         );
     }
 
