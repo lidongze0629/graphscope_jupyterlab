@@ -1,4 +1,4 @@
-import { ReactWidget, UseSignal  } from '@jupyterlab/apputils';
+import { ReactWidget, UseSignal, ToolbarButtonComponent } from '@jupyterlab/apputils';
 
 import { CommandRegistry } from '@lumino/commands';
 
@@ -10,6 +10,8 @@ import { INotebookTracker } from '@jupyterlab/notebook';
 
 import { CodeCell, MarkdownCell } from '@jupyterlab/cells';
 
+import { caretDownIcon, caretRightIcon, Collapse } from '@jupyterlab/ui-components';
+
 import React from 'react';
 
 import { gsIcon } from './common';
@@ -20,7 +22,19 @@ import '@grapecity/wijmo.styles/wijmo.css';
 
 import 'bootstrap/dist/css/bootstrap.css';
 
-import * as wjNav from '@grapecity/wijmo.react.nav';
+// import * as wjNav from '@grapecity/wijmo.react.nav';
+
+/**
+ * Icons with custom styling bound.
+    */
+const caretDownIconStyled = caretDownIcon.bindprops({
+    height: 'auto',
+    width: '20px'
+});
+const caretRightIconStyled = caretRightIcon.bindprops({
+    height: 'auto',
+    width: '20px'
+});
 
 export function getData() {
     return [
@@ -70,6 +84,128 @@ interface GSSessionVariable {
     items: GSGraphVariable[],
 }
 
+/**
+ *
+ */
+export class CollapsibleSection extends React.Component<
+    CollapsibleSection.IProperties,
+    CollapsibleSection.IState
+> {
+    constructor(props: CollapsibleSection.IProperties) {
+        super(props);
+        this.state = {
+            isOpen: props.isOpen ? true : false
+        }
+    }
+
+    /**
+     * Render the collapsible section using the virtual DOM.
+     */
+    render(): React.ReactNode {
+        let icon = this.state.isOpen ? caretDownIconStyled : caretRightIconStyled;
+        let isOpen = this.state.isOpen;
+        let className = 'jp-gs-section-headerText';
+
+        if (this.props.disabled) {
+            icon = caretRightIconStyled;
+            isOpen = false;
+            className = 'jp-gs-section-headerTextDisabled ';
+        }
+
+        return (
+            <>
+                <div className="jp-gs-section-header">
+                    <ToolbarButtonComponent
+                        icon={icon}
+                        onClick={this.handleCollapse.bind(this)}
+                    />
+                    <span className={className} onContextMenu={this.onContextMenu.bind(this)}>{this.props.header}</span>
+                    {!this.props.disabled && this.props.headerElements}
+                </div>
+                <Collapse isOpen={isOpen}>{this.props.children}</Collapse>
+            </>
+        );
+    }
+
+    handleCollapse() : void {
+        this.setState(
+            {
+                isOpen: !this.state.isOpen
+            },
+            () => {
+                if (this.props.onCollapse) {
+                    this.props.onCollapse(this.state.isOpen);
+                }
+            }
+        );
+    }
+
+    onContextMenu(): void {
+        // no-op
+    }
+
+    UNSAFE_componentWillReceiveProps(
+        nextProps: CollapsibleSection.IProperties
+    ): void {
+        if (nextProps.forceOpen) {
+            this.setState({ isOpen: true });
+        }
+    }
+}
+
+/**
+ * The namespace for collapsible section statics.
+ */
+export namespace CollapsibleSection {
+    /**
+     * React properties for collapsible section component.
+     */
+    export interface IProperties {
+        /**
+         * The header string for section list.
+         */
+        header: string;
+
+        /**
+         * Whether the view will be expanded or collapsed initially, defaults to open.
+         */
+        isOpen?: boolean;
+
+        /**
+         * Handle collapse event.
+         */
+        onCollapse?: (isOpen: boolean) => void;
+
+        /**
+         * Any additional elements to add to the header.
+         */
+        headerElements?: React.ReactNode;
+
+        /**
+         * If true, the section will be collapsed and will not respond
+         * to open or close actions.
+         */
+        disabled?: boolean;
+
+        /**
+         * If true, the section will be opened if not disabled.
+         */
+        forceOpen?: boolean;
+    }
+
+    /**
+     * React state for collapsible section component.
+     */
+    export interface IState {
+        /**
+         * Whether the section is expanded or collapsed.
+         */
+        isOpen: boolean;
+    }
+}
+
+
+
 interface IProperties {
     commands: CommandRegistry,
     translator?: ITranslator;
@@ -97,11 +233,53 @@ class GSSideBarComponent extends React.Component<IProperties, IState> {
 
                 <UseSignal signal={this.props.signal}>
                 {() => {
-                    return (
-                        <div className="container-fluid">
-                            <wjNav.TreeView itemsSource={ this.props.widget.payload } displayMemberPath="header" childItemsPath="items" itemClicked={this.onItemClicked.bind(this)}></wjNav.TreeView>
-                        </div>
+                    const elements: React.ReactElement<any>[] = [];
+                    // content of session and graph
+                    const content: any[] = [];
+                    content.push(
+                        <CollapsibleSection
+                            header='Default Session'
+                            isOpen={true}
+                            disabled={false}
+                        >
+                            <div className='jp-gs-section-content'>
+                                <div>
+                                    g1
+                                </div>
+                                <div>
+                                    g2
+                                </div>
+                            </div>
+                        </CollapsibleSection>
                     )
+                    content.push(
+                        <CollapsibleSection
+                            header='Session1'
+                            isOpen={false}
+                            disabled={false}
+                        >
+                        </CollapsibleSection>
+                    )
+                    content.push(
+                        <CollapsibleSection
+                            header='Session2'
+                            isOpen={false}
+                            disabled={true}
+                        >
+                        <div>headerElements</div>
+                        </CollapsibleSection>
+                    )
+                    elements.push(
+                        <div key="content" className='jp-gs-sidebar-content'>
+                            {content}
+                        </div>
+                    );
+                    return elements;
+                    // return (
+                    //     <div className="container-fluid">
+                    //         <wjNav.TreeView itemsSource={ this.props.widget.payload } displayMemberPath="header" childItemsPath="items" itemClicked={this.onItemClicked.bind(this)}></wjNav.TreeView>
+                    //     </div>
+                    // )
                 }}
                 </UseSignal>
 

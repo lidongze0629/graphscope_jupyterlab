@@ -30,9 +30,54 @@
   text-transform: uppercase;
 }
 
-.jp-stack-pannel-icon-header {
-  flex: 0 0 auto;
+.jp-gs-sidebar-content {
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+/*
+  Section headers
+*/
+
+
+.jp-GSSideBarContents .jp-gs-section-header {
   display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
+  justify-content: space-between;
+  flex: 0 0 auto;
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 1px;
+  font-size: var(--jp-ui-font-size0);
+  line-height: 24px;
+  height: 24px;
+  padding: 4px;
+}
+
+.jp-GSSideBarContents.jp-gs-section-header > .jp-ToolbarButtonComponent {
+  padding: 0 2px;
+  border: 1px solid transparent;
+  background-color: var(--jp-layout-color1);
+  color: var(--jp-ui-font-color1);
+}
+
+.jp-GSSideBarContents
+  .jp-gs-section-header
+  .jp-gs-section-headerText {
+  flex: 1 0 auto;
+  margin: 0 4px;
+}
+
+.jp-GSSideBarContents
+  .jp-gs-section-header
+  .jp-gs-section-headerTextDisabled {
+  flex: 1 0 auto;
+  margin: 0 4px;
+  color: var(--jp-layout-color3);
+}
+
+.jp-gs-section-content {
+  color: var(--jp-ui-font-color1);
+  font-size: var(--jp-ui-font-size1);
+  font-weight: normal;
+  margin: 8px 8px 8px 40px;
 }
