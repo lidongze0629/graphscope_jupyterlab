@@ -1,10 +1,10 @@
 {
-  "title": "Context Menu Example",
-  "description": "Context Menu Example settings.",
+  "title": "GraphScope Jupyterlab Context Menu",
+  "description": "Context Menu settings.",
   "jupyter.lab.menus": {
     "context": [
       {
-        "command": "jlab-examples/context-menu:open",
+        "command": "gs-jupyterlab/sidebar-item-context-menu:open",
         "selector": ".jp-RunningSessions-item",
         "rank": 0
       }

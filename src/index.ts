@@ -7,7 +7,7 @@ import {
 
 // import { ICommandPalette, WidgetTracker } from '@jupyterlab/apputils';
 
-import { ICommandPalette, showDialog, Dialog } from '@jupyterlab/apputils';
+import { ICommandPalette } from '@jupyterlab/apputils';
 
 import { ITranslator } from '@jupyterlab/translation';
 
@@ -15,17 +15,17 @@ import { INotebookTracker, NotebookPanel } from '@jupyterlab/notebook';
 
 // import { CommandIDs, gsIcon, PALETTE_CATEGORY, NAMESPACE } from './common';
 
-import { GSVariableManager, IGSVariableManager } from './manager';
-
-import { GSSideBarWidget } from './widget';
+import { ContextMenuManager } from './contextmenu';
 
 import { VariableInspectionHandler } from './handler';
 
-import { buildIcon } from '@jupyterlab/ui-components';
-
 import { KernelConnector } from './kernelconnector';
 
+import { GSVariableManager, IGSVariableManager } from './manager';
+
 import { Languages } from './scripts';
+
+import { GSSideBarWidget } from './widget';
 
 /**
  * A service providing variable inspection.
@@ -33,32 +33,23 @@ import { Languages } from './scripts';
 const variableinspector: JupyterFrontEndPlugin<IGSVariableManager> = {
   id: '@graphscope/variableinspector',
   autoStart: true,
-  requires: [ILabShell, ITranslator],
-  optional: [ICommandPalette, ILayoutRestorer],
+  requires: [ILabShell],
+  optional: [ICommandPalette, ILayoutRestorer, ITranslator],
   provides: IGSVariableManager,
   activate: (
     app: JupyterFrontEnd,
     labShell: ILabShell,
-    translator: ITranslator,
     palette: ICommandPalette | null,
-    restorer: ILayoutRestorer | null
+    restorer: ILayoutRestorer | null,
+    translator: ITranslator | null,
   ): IGSVariableManager => {
     const { commands } = app;
 
-    // context menu
-    app.commands.addCommand('jlab-examples/context-menu:open', {
-      label: 'Example',
-      caption: 'Example context menu button for graphscope resource',
-      icon: buildIcon,
-      execute: () => {
-        showDialog({
-          title: 'title',
-          body: 'body',
-          buttons: [Dialog.okButton()]
-        }).catch(e => console.log(e));
-      }
-    });
+    // context menu manager
+    const contextMenuManager = new ContextMenuManager(commands, translator);
+    contextMenuManager.init();
 
+    // kernel variable manager
     const manager = new GSVariableManager();
 
     // add left sidebar with rank 501
