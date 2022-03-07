@@ -30,6 +30,11 @@
   text-transform: uppercase;
 }
 
+.jp-stack-panel-header .jp-ToolbarButtonComponent {
+  background-color:rgb(160, 157, 157);
+  width: 60px;
+}
+
 .jp-gs-sidebar-content {
   overflow: auto;
   overflow-x: hidden;
@@ -80,4 +85,64 @@
   font-size: var(--jp-ui-font-size1);
   font-weight: normal;
   margin: 8px 8px 8px 40px;
+}
+
+.jp-RunningSessions-sectionList {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+
+.jp-RunningSessions-item {
+  display: flex;
+  flex-direction: row;
+  color: var(--jp-ui-font-color1);
+  height: var(--jp-private-running-item-height);
+  line-height: var(--jp-private-running-item-height);
+  padding: 0 1px;
+}
+
+.jp-RunningSessions-item:hover {
+  background-color: var(--jp-layout-color2);
+}
+
+.jp-RunningSessions-itemLabel {
+  font-size: var(--jp-ui-font-size1);
+  flex: 1 1 55%;
+  padding: 0 4px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.jp-RunningSessions-itemLabel:focus {
+  background-color: var(--jp-layout-color2);
+}
+
+
+.jp-RunningSessions-itemDetail {
+  color: var(--jp-ui-font-color3);
+  font-size: var(--jp-ui-font-size8);
+  flex: 1 1 45%;
+  padding: 0 ;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.jp-RunningSessions-item .jp-RunningSessions-itemShutdown {
+  border-radius: 0;
+}
+
+.jp-RunningSessions-item:not(:hover) .jp-RunningSessions-itemShutdown {
+  visibility: hidden;
+
+  /* display: none; */
+}
+
+.jp-RunningSessions-sectionList
+  .jp-RunningSessions-item
+  .jp-Button.jp-RunningSessions-itemShutdown:hover {
+  background: var(--jp-layout-color3);
 }

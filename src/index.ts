@@ -2,7 +2,7 @@ import { ILabShell, ILayoutRestorer, JupyterFrontEnd, JupyterFrontEndPlugin } fr
 
 // import { ICommandPalette, WidgetTracker } from '@jupyterlab/apputils';
 
-import { ICommandPalette, } from '@jupyterlab/apputils';
+import { ICommandPalette, showDialog, Dialog } from '@jupyterlab/apputils';
 
 import { ITranslator } from '@jupyterlab/translation';
 
@@ -15,6 +15,8 @@ import { GSVariableManager, IGSVariableManager } from './manager';
 import { GSSideBarWidget } from './widget';
 
 import { VariableInspectionHandler } from './handler';
+
+import { buildIcon } from '@jupyterlab/ui-components';
 
 import { KernelConnector } from './kernelconnector';
 
@@ -37,6 +39,21 @@ const variableinspector: JupyterFrontEndPlugin<IGSVariableManager> = {
     restorer: ILayoutRestorer | null,
   ): IGSVariableManager => {
     const { commands } = app;
+
+
+    // context menu
+    app.commands.addCommand('jlab-examples/context-menu:open', {
+      label: 'Example',
+      caption: "Example context menu button for graphscope resource",
+      icon: buildIcon,
+      execute: () => {
+        showDialog({
+          title: "title",
+          body: "body",
+          buttons: [Dialog.okButton()],
+        }).catch((e) => console.log(e));
+      },
+    });
 
     const manager = new GSVariableManager();
 

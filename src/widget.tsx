@@ -10,7 +10,7 @@ import { INotebookTracker } from '@jupyterlab/notebook';
 
 import { CodeCell, MarkdownCell } from '@jupyterlab/cells';
 
-import { caretDownIcon, caretRightIcon, Collapse } from '@jupyterlab/ui-components';
+import { caretDownIcon, caretRightIcon, searchIcon, addIcon, Collapse } from '@jupyterlab/ui-components';
 
 import React from 'react';
 
@@ -109,7 +109,7 @@ export class CollapsibleSection extends React.Component<
         if (this.props.disabled) {
             icon = caretRightIconStyled;
             isOpen = false;
-            className = 'jp-gs-section-headerTextDisabled ';
+            className = 'jp-gs-section-headerTextDisabled';
         }
 
         return (
@@ -119,7 +119,13 @@ export class CollapsibleSection extends React.Component<
                         icon={icon}
                         onClick={this.handleCollapse.bind(this)}
                     />
-                    <span className={className} onContextMenu={this.onContextMenu.bind(this)}>{this.props.header}</span>
+                    <span
+                        className={className}
+                        onContextMenu={this.onContextMenu.bind(this)}
+                        onClick={this.handleClick.bind(this)}
+                    >
+                        {this.props.header}
+                    </span>
                     {!this.props.disabled && this.props.headerElements}
                 </div>
                 <Collapse isOpen={isOpen}>{this.props.children}</Collapse>
@@ -138,6 +144,10 @@ export class CollapsibleSection extends React.Component<
                 }
             }
         );
+    }
+
+    handleClick() : void {
+        // no-op
     }
 
     onContextMenu(): void {
@@ -229,6 +239,12 @@ class GSSideBarComponent extends React.Component<IProperties, IState> {
             <div className="jp-GSSideBarContents">
                 <div className="jp-stack-panel-header">
                     <span>List of Resources</span>
+                    <ToolbarButtonComponent
+                        className='jp-stack-panel-icon-header'
+                        icon={addIcon}
+                        onClick={() => {}}
+                        tooltip="Create a new session"
+                    />
                 </div>
 
                 <UseSignal signal={this.props.signal}>
@@ -238,25 +254,61 @@ class GSSideBarComponent extends React.Component<IProperties, IState> {
                     const content: any[] = [];
                     content.push(
                         <CollapsibleSection
+                            key="session-section"
                             header='Default Session'
                             isOpen={true}
                             disabled={false}
+                            headerElements={
+                                <ToolbarButtonComponent
+                                key="add-graph-button"
+                                icon={addIcon}
+                                onClick={() => {}}
+                                tooltip="Create a new graph"
+                                />
+                            }
                         >
                             <div className='jp-gs-section-content'>
-                                <div>
-                                    g1
-                                </div>
-                                <div>
-                                    g2
-                                </div>
+                               <ul className='jp-RunningSessions-sectionList'>
+                                    <li className='jp-RunningSessions-item'>
+                                        <span className='jp-RunningSessions-itemLabel' title='Graph' onClick={() => {}}>
+                                            graph1
+                                        </span>
+                                        <ToolbarButtonComponent
+                                            className='jp-RunningSessions-itemShutdown'
+                                            icon={searchIcon}
+                                            onClick={()=>{}}
+                                            tooltip="detail"
+                                        />
+                                    </li>
+                                    <li className='jp-RunningSessions-item'>
+                                        <span className='jp-RunningSessions-itemLabel' title='Graph' onClick={() => {}}>
+                                            graph2
+                                        </span>
+                                        <ToolbarButtonComponent
+                                            className='jp-RunningSessions-itemShutdown'
+                                            icon={searchIcon}
+                                            onClick={()=>{}}
+                                            tooltip="detail"
+                                        />
+                                    </li>
+                               </ul>
                             </div>
                         </CollapsibleSection>
                     )
                     content.push(
                         <CollapsibleSection
+                            key="session-section"
                             header='Session1'
                             isOpen={false}
                             disabled={false}
+                            headerElements={
+                                <ToolbarButtonComponent
+                                key="add-graph-button"
+                                icon={addIcon}
+                                onClick={() => {}}
+                                tooltip="Create a new graph"
+                            />
+                            }
                         >
                         </CollapsibleSection>
                     )
@@ -265,6 +317,14 @@ class GSSideBarComponent extends React.Component<IProperties, IState> {
                             header='Session2'
                             isOpen={false}
                             disabled={true}
+                            headerElements={
+                                <ToolbarButtonComponent
+                                key="add-graph-button"
+                                icon={addIcon}
+                                onClick={() => {}}
+                                tooltip="Create a new graph"
+                                />
+                            }
                         >
                         <div>headerElements</div>
                         </CollapsibleSection>
