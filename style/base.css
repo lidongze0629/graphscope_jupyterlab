@@ -31,7 +31,7 @@
 }
 
 .jp-stack-panel-header .jp-ToolbarButtonComponent {
-  background-color:rgb(160, 157, 157);
+  background-color:rgb(177, 172, 172);
   width: 60px;
 }
 
@@ -109,6 +109,16 @@
 
 .jp-RunningSessions-itemLabel {
   font-size: var(--jp-ui-font-size1);
+  flex: 1 1 55%;
+  padding: 0 4px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.jp-RunningSessions-itemLabelDisabled {
+  font-size: var(--jp-ui-font-size1);
+  color: var(--jp-layout-color3);
   flex: 1 1 55%;
   padding: 0 4px;
   text-overflow: ellipsis;

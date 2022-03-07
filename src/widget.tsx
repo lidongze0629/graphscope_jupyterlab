@@ -36,45 +36,6 @@ const caretRightIconStyled = caretRightIcon.bindprops({
     width: '20px'
 });
 
-export function getData() {
-    return [
-        {
-            header: 'Electronics', img: 'resources/electronics.png', items: [
-                { header: 'Trimmers/Shavers' },
-                { header: 'Tablets' },
-                {
-                    header: 'Phones', img: 'resources/phones.png', items: [
-                        { header: 'Apple' },
-                        { header: 'Motorola', newItem: true },
-                        { header: 'Nokia' },
-                        { header: 'Samsung' }
-                    ]
-                },
-                { header: 'Speakers', newItem: true },
-                { header: 'Monitors' }
-            ]
-        },
-        {
-            header: 'Toys', img: 'resources/toys.png', items: [
-                { header: 'Shopkins' },
-                { header: 'Train Sets' },
-                { header: 'Science Kit', newItem: true },
-                { header: 'Play-Doh' },
-                { header: 'Crayola' }
-            ]
-        },
-        {
-            header: 'Home', img: 'resources/home.png', items: [
-                { header: 'Coffee Maker' },
-                { header: 'Breadmaker', newItem: true },
-                { header: 'Solar Panel', newItem: true },
-                { header: 'Work Table' },
-                { header: 'Propane Grill' }
-            ]
-        }
-    ];
-}
-
 interface GSGraphVariable {
     header: string
 }
@@ -133,7 +94,7 @@ export class CollapsibleSection extends React.Component<
         );
     }
 
-    handleCollapse() : void {
+    handleCollapse(): void {
         this.setState(
             {
                 isOpen: !this.state.isOpen
@@ -146,7 +107,7 @@ export class CollapsibleSection extends React.Component<
         );
     }
 
-    handleClick() : void {
+    handleClick(): void {
         // no-op
     }
 
@@ -242,105 +203,105 @@ class GSSideBarComponent extends React.Component<IProperties, IState> {
                     <ToolbarButtonComponent
                         className='jp-stack-panel-icon-header'
                         icon={addIcon}
-                        onClick={() => {}}
+                        onClick={() => { }}
                         tooltip="Create a new session"
                     />
                 </div>
 
                 <UseSignal signal={this.props.signal}>
-                {() => {
-                    const elements: React.ReactElement<any>[] = [];
-                    // content of session and graph
-                    const content: any[] = [];
-                    content.push(
-                        <CollapsibleSection
-                            key="session-section"
-                            header='Default Session'
-                            isOpen={true}
-                            disabled={false}
-                            headerElements={
-                                <ToolbarButtonComponent
-                                key="add-graph-button"
-                                icon={addIcon}
-                                onClick={() => {}}
-                                tooltip="Create a new graph"
-                                />
-                            }
-                        >
-                            <div className='jp-gs-section-content'>
-                               <ul className='jp-RunningSessions-sectionList'>
-                                    <li className='jp-RunningSessions-item'>
-                                        <span className='jp-RunningSessions-itemLabel' title='Graph' onClick={() => {}}>
-                                            graph1
-                                        </span>
-                                        <ToolbarButtonComponent
-                                            className='jp-RunningSessions-itemShutdown'
-                                            icon={searchIcon}
-                                            onClick={()=>{}}
-                                            tooltip="detail"
-                                        />
-                                    </li>
-                                    <li className='jp-RunningSessions-item'>
-                                        <span className='jp-RunningSessions-itemLabel' title='Graph' onClick={() => {}}>
-                                            graph2
-                                        </span>
-                                        <ToolbarButtonComponent
-                                            className='jp-RunningSessions-itemShutdown'
-                                            icon={searchIcon}
-                                            onClick={()=>{}}
-                                            tooltip="detail"
-                                        />
-                                    </li>
-                               </ul>
+                    {() => {
+                        const elements: React.ReactElement<any>[] = [];
+                        // content of session and graph
+                        const content: any[] = [];
+                        content.push(
+                            <CollapsibleSection
+                                key="session-section"
+                                header='Default Session'
+                                isOpen={true}
+                                disabled={false}
+                                headerElements={
+                                    <ToolbarButtonComponent
+                                        key="add-graph-button"
+                                        icon={addIcon}
+                                        onClick={() => { }}
+                                        tooltip="Create a new graph"
+                                    />
+                                }
+                            >
+                                <div className='jp-gs-section-content'>
+                                    <ul className='jp-RunningSessions-sectionList'>
+                                        <li className='jp-RunningSessions-item'>
+                                            <span className='jp-RunningSessions-itemLabel' title='Graph' onClick={() => { }}>
+                                                graph1
+                                            </span>
+                                            <ToolbarButtonComponent
+                                                className='jp-RunningSessions-itemShutdown'
+                                                icon={searchIcon}
+                                                onClick={() => { }}
+                                                tooltip="detail"
+                                            />
+                                        </li>
+                                        <li className='jp-RunningSessions-item'>
+                                            <span className='jp-RunningSessions-itemLabel' title='Graph' onClick={() => { }}>
+                                                graph2
+                                            </span>
+                                            <ToolbarButtonComponent
+                                                className='jp-RunningSessions-itemShutdown'
+                                                icon={searchIcon}
+                                                onClick={() => { }}
+                                                tooltip="detail"
+                                            />
+                                        </li>
+                                        <li className='jp-RunningSessions-item'>
+                                            <span className='jp-RunningSessions-itemLabelDisabled' title='Uploaded graph' onClick={() => { }}>
+                                                graph3
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </CollapsibleSection>
+                        )
+                        content.push(
+                            <CollapsibleSection
+                                key="session-section"
+                                header='Session1'
+                                isOpen={false}
+                                disabled={false}
+                                headerElements={
+                                    <ToolbarButtonComponent
+                                        key="add-graph-button"
+                                        icon={addIcon}
+                                        onClick={() => { }}
+                                        tooltip="Create a new graph"
+                                    />
+                                }
+                            >
+                            </CollapsibleSection>
+                        )
+                        content.push(
+                            <CollapsibleSection
+                                header='Session2'
+                                isOpen={false}
+                                disabled={true}
+                                headerElements={
+                                    <ToolbarButtonComponent
+                                        key="add-graph-button"
+                                        icon={addIcon}
+                                        onClick={() => { }}
+                                        tooltip="Create a new graph"
+                                    />
+                                }
+                            >
+                                <div>headerElements</div>
+                            </CollapsibleSection>
+                        )
+                        elements.push(
+                            <div key="content" className='jp-gs-sidebar-content'>
+                                {content}
                             </div>
-                        </CollapsibleSection>
-                    )
-                    content.push(
-                        <CollapsibleSection
-                            key="session-section"
-                            header='Session1'
-                            isOpen={false}
-                            disabled={false}
-                            headerElements={
-                                <ToolbarButtonComponent
-                                key="add-graph-button"
-                                icon={addIcon}
-                                onClick={() => {}}
-                                tooltip="Create a new graph"
-                            />
-                            }
-                        >
-                        </CollapsibleSection>
-                    )
-                    content.push(
-                        <CollapsibleSection
-                            header='Session2'
-                            isOpen={false}
-                            disabled={true}
-                            headerElements={
-                                <ToolbarButtonComponent
-                                key="add-graph-button"
-                                icon={addIcon}
-                                onClick={() => {}}
-                                tooltip="Create a new graph"
-                                />
-                            }
-                        >
-                        <div>headerElements</div>
-                        </CollapsibleSection>
-                    )
-                    elements.push(
-                        <div key="content" className='jp-gs-sidebar-content'>
-                            {content}
-                        </div>
-                    );
-                    return elements;
-                    // return (
-                    //     <div className="container-fluid">
-                    //         <wjNav.TreeView itemsSource={ this.props.widget.payload } displayMemberPath="header" childItemsPath="items" itemClicked={this.onItemClicked.bind(this)}></wjNav.TreeView>
-                    //     </div>
-                    // )
-                }}
+                        );
+                        return elements;
+                    }}
                 </UseSignal>
 
             </div>
@@ -433,9 +394,9 @@ function GSMainAreaComponent(props: {
                 <UseSignal signal={props.signal}>
                     {() => {
                         return (
-                        <ListView
-                            payload={props.widget.payload}
-                        />
+                            <ListView
+                                payload={props.widget.payload}
+                            />
                         )
                     }}
                 </UseSignal>
@@ -474,7 +435,7 @@ export abstract class IVariableInspectorWidget extends ReactWidget implements IV
         }
     }
 
-    get handler() : VariableInspector.IInspectable | null {
+    get handler(): VariableInspector.IInspectable | null {
         return this._handler;
     }
 
@@ -507,7 +468,7 @@ export class GSWidget extends IVariableInspectorWidget {
         }
         if (cell instanceof MarkdownCell) {
             cell.editor.replaceSelection('```' + '\n' + code + '\n```');
-        } else if(cell instanceof CodeCell) {
+        } else if (cell instanceof CodeCell) {
             cell.editor.replaceSelection(code);
         }
     }
@@ -621,7 +582,7 @@ export class GSSideBarWidget extends IVariableInspectorWidget {
             if (v.type === "graph") {
                 let session_id = v.props.session_id;
                 if (!sessions.has(session_id)) {
-                    sessions.set(session_id, { "header": "Default Session", items: []});
+                    sessions.set(session_id, { "header": "Default Session", items: [] });
                 }
                 let session = sessions.get(session_id);
                 session.items.push({ header: v.name });
@@ -639,7 +600,7 @@ export class GSSideBarWidget extends IVariableInspectorWidget {
     /**
      * Handle handler disposed signals.
      */
-     protected onHandlerDisposed(sender: any, args: void): void {
+    protected onHandlerDisposed(sender: any, args: void): void {
         this.handler = null;
     }
 

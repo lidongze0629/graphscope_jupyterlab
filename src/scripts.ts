@@ -2,21 +2,21 @@
  * Languages Model
  */
 export namespace Languages {
-    export type LanguageModel = {
-        initScript: string;
-        queryCommand: string;
-        // deleteCommand: string;
-    };
+  export type LanguageModel = {
+    initScript: string;
+    queryCommand: string;
+    // deleteCommand: string;
+  };
 }
 
-/** 
+/**
  * Code template for languages, only support python3 kernel now.
  */
 export abstract class Languages {
-    /**
-     * Init script for ipython(python3) kernel
-     */
-    static py_init_script = `
+  /**
+   * Init script for ipython(python3) kernel
+   */
+  static py_init_script = `
 import json
 import sys
 
@@ -88,34 +88,34 @@ def _gs_jupyterlab_delete_variable(x):
     exec("del %s" % x, globals())
 `;
 
-    /**
-     * Select scripts according to the different languages.
-     */
-    static scripts: { [lang: string]: Languages.LanguageModel } = {
-        python3: {
-            initScript: Languages.py_init_script,
-            queryCommand: '_gs_jupyterlab_inspect_variable()',
-            // deleteCommand: '_gs_jupyterlab_delete_variable',
-        },
-        python2: {
-            initScript: Languages.py_init_script,
-            queryCommand: '_gs_jupyterlab_inspect_variable()',
-            // deleteCommand: '_gs_jupyterlab_delete_variable',
-        },
-        python: {
-            initScript: Languages.py_init_script,
-            queryCommand: '_gs_jupyterlab_inspect_variable()',
-            // deleteCommand: '_gs_jupyterlab_delete_variable',
-        }
-    };
-
-    public static getScript(lang: string): Promise<Languages.LanguageModel> {
-        return new Promise((resolve, reject) => {
-            if (lang in Languages.scripts) {
-                resolve(Languages.scripts[lang]);
-            } else {
-                reject('Language ' + lang + ' not supported yet!');
-            }
-        });
+  /**
+   * Select scripts according to the different languages.
+   */
+  static scripts: { [lang: string]: Languages.LanguageModel } = {
+    python3: {
+      initScript: Languages.py_init_script,
+      queryCommand: '_gs_jupyterlab_inspect_variable()'
+      // deleteCommand: '_gs_jupyterlab_delete_variable',
+    },
+    python2: {
+      initScript: Languages.py_init_script,
+      queryCommand: '_gs_jupyterlab_inspect_variable()'
+      // deleteCommand: '_gs_jupyterlab_delete_variable',
+    },
+    python: {
+      initScript: Languages.py_init_script,
+      queryCommand: '_gs_jupyterlab_inspect_variable()'
+      // deleteCommand: '_gs_jupyterlab_delete_variable',
     }
+  };
+
+  public static getScript(lang: string): Promise<Languages.LanguageModel> {
+    return new Promise((resolve, reject) => {
+      if (lang in Languages.scripts) {
+        resolve(Languages.scripts[lang]);
+      } else {
+        reject('Language ' + lang + ' not supported yet!');
+      }
+    });
+  }
 }
