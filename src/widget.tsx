@@ -1,4 +1,8 @@
-import { ReactWidget, UseSignal, ToolbarButtonComponent } from '@jupyterlab/apputils';
+import {
+  ReactWidget,
+  UseSignal,
+  ToolbarButtonComponent
+} from '@jupyterlab/apputils';
 
 import { CommandRegistry } from '@lumino/commands';
 
@@ -10,7 +14,13 @@ import { INotebookTracker } from '@jupyterlab/notebook';
 
 import { CodeCell, MarkdownCell } from '@jupyterlab/cells';
 
-import { caretDownIcon, caretRightIcon, searchIcon, addIcon, Collapse } from '@jupyterlab/ui-components';
+import {
+  caretDownIcon,
+  caretRightIcon,
+  searchIcon,
+  addIcon,
+  Collapse
+} from '@jupyterlab/ui-components';
 
 import React from 'react';
 
@@ -26,357 +36,221 @@ import 'bootstrap/dist/css/bootstrap.css';
 
 /**
  * Icons with custom styling bound.
-    */
+ */
 const caretDownIconStyled = caretDownIcon.bindprops({
-    height: 'auto',
-    width: '20px'
+  height: 'auto',
+  width: '20px'
 });
 const caretRightIconStyled = caretRightIcon.bindprops({
-    height: 'auto',
-    width: '20px'
+  height: 'auto',
+  width: '20px'
 });
 
-interface GSGraphVariable {
-    header: string
-}
-
-interface GSSessionVariable {
-    header: string,
-    items: GSGraphVariable[],
-}
 
 /**
- *
+ * Namespace of graphscope variable
  */
-export class CollapsibleSection extends React.Component<
-    CollapsibleSection.IProperties,
-    CollapsibleSection.IState
-> {
-    constructor(props: CollapsibleSection.IProperties) {
-        super(props);
-        this.state = {
-            isOpen: props.isOpen ? true : false
-        }
-    }
-
+export namespace GSVariable {
+  /**
+   * Graph variable interface of graphscope.
+   */
+  export interface GSAppOrGraphVariable {
     /**
-     * Render the collapsible section using the virtual DOM.
+     * Variable name of the application/graph.
      */
-    render(): React.ReactNode {
-        let icon = this.state.isOpen ? caretDownIconStyled : caretRightIconStyled;
-        let isOpen = this.state.isOpen;
-        let className = 'jp-gs-section-headerText';
+    name: string;
+    /**
+     * Type: graph or application
+     */
+    type: string;
+    /**
+     * State, loaded or unloaded.
+     */
+    state: string;
+  }
 
-        if (this.props.disabled) {
-            icon = caretRightIconStyled;
-            isOpen = false;
-            className = 'jp-gs-section-headerTextDisabled';
-        }
-
-        return (
-            <>
-                <div className="jp-gs-section-header">
-                    <ToolbarButtonComponent
-                        icon={icon}
-                        onClick={this.handleCollapse.bind(this)}
-                    />
-                    <span
-                        className={className}
-                        onContextMenu={this.onContextMenu.bind(this)}
-                        onClick={this.handleClick.bind(this)}
-                    >
-                        {this.props.header}
-                    </span>
-                    {!this.props.disabled && this.props.headerElements}
-                </div>
-                <Collapse isOpen={isOpen}>{this.props.children}</Collapse>
-            </>
-        );
-    }
-
-    handleCollapse(): void {
-        this.setState(
-            {
-                isOpen: !this.state.isOpen
-            },
-            () => {
-                if (this.props.onCollapse) {
-                    this.props.onCollapse(this.state.isOpen);
-                }
-            }
-        );
-    }
-
-    handleClick(): void {
-        // no-op
-    }
-
-    onContextMenu(): void {
-        // no-op
-    }
-
-    UNSAFE_componentWillReceiveProps(
-        nextProps: CollapsibleSection.IProperties
-    ): void {
-        if (nextProps.forceOpen) {
-            this.setState({ isOpen: true });
-        }
-    }
+  /**
+   * Session variable interface of graphscope.
+   */
+  export interface GSSessionVariable {
+    /**
+     * Variable name of the session.
+     */
+    name: string;
+    /**
+     * State, active、disconnected or closed.
+     */
+    state: string;
+    /**
+     * Resource exists in this session.
+     */
+    items: GSAppOrGraphVariable[];
+  }
 }
 
 /**
  * The namespace for collapsible section statics.
  */
-export namespace CollapsibleSection {
+ export namespace CollapsibleSection {
+  /**
+   * React properties for collapsible section component.
+   */
+  export interface IProperties {
     /**
-     * React properties for collapsible section component.
+     * The header string for section list.
      */
-    export interface IProperties {
-        /**
-         * The header string for section list.
-         */
-        header: string;
-
-        /**
-         * Whether the view will be expanded or collapsed initially, defaults to open.
-         */
-        isOpen?: boolean;
-
-        /**
-         * Handle collapse event.
-         */
-        onCollapse?: (isOpen: boolean) => void;
-
-        /**
-         * Any additional elements to add to the header.
-         */
-        headerElements?: React.ReactNode;
-
-        /**
-         * If true, the section will be collapsed and will not respond
-         * to open or close actions.
-         */
-        disabled?: boolean;
-
-        /**
-         * If true, the section will be opened if not disabled.
-         */
-        forceOpen?: boolean;
-    }
+    header: string;
 
     /**
-     * React state for collapsible section component.
+     * Whether the view will be expanded or collapsed initially, defaults to open.
      */
-    export interface IState {
-        /**
-         * Whether the section is expanded or collapsed.
-         */
-        isOpen: boolean;
-    }
+    isOpen?: boolean;
+
+    /**
+     * Handle collapse event.
+     */
+    onCollapse?: (isOpen: boolean) => void;
+
+    /**
+     * Any additional elements to add to the header.
+     */
+    headerElements?: React.ReactNode;
+
+    /**
+     * Tooltip for collapsible section
+     */
+    tooltip?: string;
+
+    /**
+     * If true, the section will be collapsed and will not respond
+     * to open or close actions.
+     */
+    disabled?: boolean;
+
+    /**
+     * If true, the section will be opened if not disabled.
+     */
+    forceOpen?: boolean;
+  }
+
+  /**
+   * React state for collapsible section component.
+   */
+  export interface IState {
+    /**
+     * Whether the section is expanded or collapsed.
+     */
+    isOpen: boolean;
+  }
 }
 
+export class CollapsibleSection extends React.Component<
+  CollapsibleSection.IProperties,
+  CollapsibleSection.IState
+> {
+  constructor(props: CollapsibleSection.IProperties) {
+    super(props);
+    this.state = {
+      isOpen: props.isOpen ? true : false
+    };
+  }
 
+  /**
+   * Render the collapsible section using the virtual DOM.
+   */
+  render(): React.ReactNode {
+    let icon = this.state.isOpen ? caretDownIconStyled : caretRightIconStyled;
+    let isOpen = this.state.isOpen;
+    let className = 'jp-gsSidebar-section-headerText';
 
-interface IProperties {
-    commands: CommandRegistry,
-    translator?: ITranslator;
-    widget: GSSideBarWidget,
-    signal: ISignal<GSSideBarWidget, void>,
-}
-
-interface IState {
-    data: any,
-    msg: string,
-}
-
-
-class GSSideBarComponent extends React.Component<IProperties, IState> {
-    constructor(props: IProperties) {
-        super(props);
+    if (this.props.disabled) {
+      icon = caretRightIconStyled;
+      isOpen = false;
+      className = 'jp-gsSidebar-section-headerTextDisabled';
     }
 
-    render() {
-        return (
-            <div className="jp-GSSideBarContents">
-                <div className="jp-stack-panel-header">
-                    <span>List of Resources</span>
-                    <ToolbarButtonComponent
-                        className='jp-stack-panel-icon-header'
-                        icon={addIcon}
-                        onClick={() => { }}
-                        tooltip="Create a new session"
-                    />
-                </div>
+    return (
+      <>
+        <div className="jp-gsSidebar-section-header">
+          <ToolbarButtonComponent
+            icon={icon}
+            onClick={this.handleCollapse.bind(this)}
+          />
+          <span
+            className={className}
+            onContextMenu={this.onContextMenu.bind(this)}
+            onClick={this.handleClick.bind(this)}
+            title={this.props.tooltip}
+          >
+            {this.props.header}
+          </span>
+          {!this.props.disabled && this.props.headerElements}
+        </div>
+        <Collapse isOpen={isOpen}>{this.props.children}</Collapse>
+      </>
+    );
+  }
 
-                <UseSignal signal={this.props.signal}>
-                    {() => {
-                        const elements: React.ReactElement<any>[] = [];
-                        // content of session and graph
-                        const content: any[] = [];
-                        content.push(
-                            <CollapsibleSection
-                                key="session-section"
-                                header='Default Session'
-                                isOpen={true}
-                                disabled={false}
-                                headerElements={
-                                    <ToolbarButtonComponent
-                                        key="add-graph-button"
-                                        icon={addIcon}
-                                        onClick={() => { }}
-                                        tooltip="Create a new graph"
-                                    />
-                                }
-                            >
-                                <div className='jp-gs-section-content'>
-                                    <ul className='jp-RunningSessions-sectionList'>
-                                        <li className='jp-RunningSessions-item'>
-                                            <span className='jp-RunningSessions-itemLabel' title='Graph' onClick={() => { }}>
-                                                graph1
-                                            </span>
-                                            <ToolbarButtonComponent
-                                                className='jp-RunningSessions-itemShutdown'
-                                                icon={searchIcon}
-                                                onClick={() => { }}
-                                                tooltip="detail"
-                                            />
-                                        </li>
-                                        <li className='jp-RunningSessions-item'>
-                                            <span className='jp-RunningSessions-itemLabel' title='Graph' onClick={() => { }}>
-                                                graph2
-                                            </span>
-                                            <ToolbarButtonComponent
-                                                className='jp-RunningSessions-itemShutdown'
-                                                icon={searchIcon}
-                                                onClick={() => { }}
-                                                tooltip="detail"
-                                            />
-                                        </li>
-                                        <li className='jp-RunningSessions-item'>
-                                            <span className='jp-RunningSessions-itemLabelDisabled' title='Uploaded graph' onClick={() => { }}>
-                                                graph3
-                                            </span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </CollapsibleSection>
-                        )
-                        content.push(
-                            <CollapsibleSection
-                                key="session-section"
-                                header='Session1'
-                                isOpen={false}
-                                disabled={false}
-                                headerElements={
-                                    <ToolbarButtonComponent
-                                        key="add-graph-button"
-                                        icon={addIcon}
-                                        onClick={() => { }}
-                                        tooltip="Create a new graph"
-                                    />
-                                }
-                            >
-                            </CollapsibleSection>
-                        )
-                        content.push(
-                            <CollapsibleSection
-                                header='Session2'
-                                isOpen={false}
-                                disabled={true}
-                                headerElements={
-                                    <ToolbarButtonComponent
-                                        key="add-graph-button"
-                                        icon={addIcon}
-                                        onClick={() => { }}
-                                        tooltip="Create a new graph"
-                                    />
-                                }
-                            >
-                                <div>headerElements</div>
-                            </CollapsibleSection>
-                        )
-                        elements.push(
-                            <div key="content" className='jp-gs-sidebar-content'>
-                                {content}
-                            </div>
-                        );
-                        return elements;
-                    }}
-                </UseSignal>
+  handleCollapse(): void {
+    this.setState(
+      {
+        isOpen: !this.state.isOpen
+      },
+      () => {
+        if (this.props.onCollapse) {
+          this.props.onCollapse(this.state.isOpen);
+        }
+      }
+    );
+  }
 
-            </div>
-        );
+  handleClick(): void {
+    // no-op
+  }
+
+  onContextMenu(): void {
+    // no-op
+  }
+
+  UNSAFE_componentWillReceiveProps(
+    nextProps: CollapsibleSection.IProperties
+  ): void {
+    if (nextProps.forceOpen) {
+      this.setState({ isOpen: true });
     }
-
-    public onItemClicked(s: any, e: any) {
-        console.log(s.selectedItem.header);
-    }
+  }
 }
 
 /**
- * Sidebar react component
- * 
- * @return The react component
+ * remain for mainarea component
  */
-/*
-function GSSideBarComponent(props: {
-    commands: CommandRegistry,
-    translator?: ITranslator;
-    widget: GSSideBarWidget,
-    signal: ISignal<GSSideBarWidget, void>,
-}) {
-    // const commands = props.commands;
-    // const translator = props.translator || nullTranslator;
-    // const trans = translator.load('jupyterlab');
-    return (
-        <>
-            <div>
-                <UseSignal signal={props.signal}>
-                    {() => {
-                        return (
-                        <ListView
-                            payload={props.widget.payload}
-                        />
-                        )
-                    }}
-                </UseSignal>
-            </div>
-        </>
-    )
-}
-**/
-
-function Item(props: {
-    name: string,
-    type: string,
-    content: string
-}) {
-    return (
-        <li>
-            <span>
-                {props.name} {props.type} {props.content}
-            </span>
-        </li>
-    )
+function Item(props: { name: string; type: string; content: string }) {
+  return (
+    <li>
+      <span>
+        {props.name} {props.type} {props.content}
+      </span>
+    </li>
+  );
 }
 
-
-function ListView(props: {
-    payload: VariableInspector.IVariable[],
-}) {
-    return (
-        <ul>
-            {props.payload.map((variable, i) => {
-                return (
-                    <Item
-                        name={variable.name}
-                        type={variable.type}
-                        content={variable.content}
-                    />
-                )
-            })}
-        </ul>
-    );
+/**
+ * remain for mainarea component
+ */
+function ListView(props: { payload: VariableInspector.IVariable[] }) {
+  return (
+    <ul>
+      {props.payload.map((variable, i) => {
+        return (
+          <Item
+            name={variable.name}
+            type={variable.type}
+            content={variable.content}
+          />
+        );
+      })}
+    </ul>
+  );
 }
 
 /**
@@ -385,249 +259,395 @@ function ListView(props: {
  * @return The react component
  */
 function GSMainAreaComponent(props: {
-    widget: GSWidget,
-    signal: ISignal<GSWidget, void>,
+  widget: GSWidget;
+  signal: ISignal<GSWidget, void>;
 }) {
-    return (
-        <>
-            <div>
-                <UseSignal signal={props.signal}>
-                    {() => {
-                        return (
-                            <ListView
-                                payload={props.widget.payload}
-                            />
-                        )
-                    }}
-                </UseSignal>
-                <input type="text" id="example">
-                </input>
-                <button
-                    onClick={(): void => {
-                        let a = (document.getElementById("example") as HTMLInputElement).value;
-                        props.widget.tempMethodForInsertCodeIntoNotebookCell(a);
-                    }}
-                >
-                    Insert code into cell
-                </button>
-            </div>
-        </>
-    )
+  return (
+    <>
+      <div>
+        <UseSignal signal={props.signal}>
+          {() => {
+            return <ListView payload={props.widget.payload} />;
+          }}
+        </UseSignal>
+        <input type="text" id="example"></input>
+        <button
+          onClick={(): void => {
+            let a = (document.getElementById('example') as HTMLInputElement)
+              .value;
+            props.widget.tempMethodForInsertCodeIntoNotebookCell(a);
+          }}
+        >
+          Insert code into cell
+        </button>
+      </div>
+    </>
+  );
 }
 
-
-export abstract class IVariableInspectorWidget extends ReactWidget implements IVariableInspector {
-    set handler(handler: VariableInspector.IInspectable | null) {
-        if (this._handler == handler) {
-            return;
-        }
-        // remove old subscriptions
-        if (this._handler) {
-            this._handler.inspected.disconnect(this.onInspectorUpdate, this);
-            this._handler.disposed.disconnect(this.onHandlerDisposed, this);
-        }
-        this._handler = handler;
-        // subscriptions
-        if (this._handler) {
-            this._handler.inspected.connect(this.onInspectorUpdate, this);
-            this._handler.disposed.connect(this.onHandlerDisposed, this);
-            this._handler.performInspection();
-        }
+export abstract class IVariableInspectorWidget
+  extends ReactWidget
+  implements IVariableInspector {
+  set handler(handler: VariableInspector.IInspectable | null) {
+    if (this._handler == handler) {
+      return;
     }
-
-    get handler(): VariableInspector.IInspectable | null {
-        return this._handler;
+    // remove old subscriptions
+    if (this._handler) {
+      this._handler.inspected.disconnect(this.onInspectorUpdate, this);
+      this._handler.disposed.disconnect(this.onHandlerDisposed, this);
     }
+    this._handler = handler;
+    // subscriptions
+    if (this._handler) {
+      this._handler.inspected.connect(this.onInspectorUpdate, this);
+      this._handler.disposed.connect(this.onHandlerDisposed, this);
+      this._handler.performInspection();
+    }
+  }
 
-    protected abstract onInspectorUpdate(sender: any, args: VariableInspector.IVariableInspectorUpdate): void;
+  get handler(): VariableInspector.IInspectable | null {
+    return this._handler;
+  }
 
-    protected abstract onHandlerDisposed(sender: any, args: void): void;
+  protected abstract onInspectorUpdate(
+    sender: any,
+    args: VariableInspector.IVariableInspectorUpdate
+  ): void;
 
-    private _handler: VariableInspector.IInspectable | null = null;
+  protected abstract onHandlerDisposed(sender: any, args: void): void;
+
+  private _handler: VariableInspector.IInspectable | null = null;
 }
-
 
 /**
  * Main area widget
  */
 export class GSWidget extends IVariableInspectorWidget {
-    constructor(translator?: ITranslator) {
-        super();
+  constructor(translator?: ITranslator) {
+    super();
 
-        this.id = "gs-mainarea-widget";
-        this.title.icon = gsIcon;
-        this.title.closable = true;
+    this.id = 'gs-mainarea-widget';
+    this.title.icon = gsIcon;
+    this.title.closable = true;
 
-        this.translator = translator || nullTranslator;
+    this.translator = translator || nullTranslator;
+  }
+
+  tempMethodForInsertCodeIntoNotebookCell(code: string): void {
+    let cell = this._notebook.activeCell;
+    if (cell === null) {
+      return;
+    }
+    if (cell instanceof MarkdownCell) {
+      cell.editor.replaceSelection('```' + '\n' + code + '\n```');
+    } else if (cell instanceof CodeCell) {
+      cell.editor.replaceSelection(code);
+    }
+  }
+
+  get notebook(): INotebookTracker | null {
+    return this._notebook;
+  }
+
+  set notebook(nb: INotebookTracker | null) {
+    this._notebook = nb;
+  }
+
+  dispose(): void {
+    if (!this.isDisposed) {
+      this.handler = null;
+      super.dispose();
+    }
+  }
+
+  protected onInspectorUpdate(
+    sender: any,
+    args: VariableInspector.IVariableInspectorUpdate
+  ): void {
+    if (!this.isAttached) {
+      return;
     }
 
-    tempMethodForInsertCodeIntoNotebookCell(code: string): void {
-        let cell = this._notebook.activeCell;
-        if (cell === null) {
-            return;
-        }
-        if (cell instanceof MarkdownCell) {
-            cell.editor.replaceSelection('```' + '\n' + code + '\n```');
-        } else if (cell instanceof CodeCell) {
-            cell.editor.replaceSelection(code);
-        }
-    }
+    // const title = args.title;
+    this._payload = args.payload;
+    this._runningChanged.emit(void 0);
+  }
 
-    get notebook(): INotebookTracker | null {
-        return this._notebook;
-    }
+  /**
+   * Handle handler disposed signals.
+   */
+  protected onHandlerDisposed(sender: any, args: void): void {
+    this.handler = null;
+  }
 
-    set notebook(nb: INotebookTracker | null) {
-        this._notebook = nb;
-    }
+  get payload(): VariableInspector.IVariable[] {
+    return this._payload;
+  }
 
-    dispose(): void {
-        if (!this.isDisposed) {
-            this.handler = null;
-            super.dispose();
-        }
-    }
+  get runningChanged(): ISignal<GSWidget, void> {
+    return this._runningChanged;
+  }
 
-    protected onInspectorUpdate(
-        sender: any, args: VariableInspector.IVariableInspectorUpdate
-    ): void {
-        if (!this.isAttached) {
-            return;
-        }
+  protected render(): JSX.Element {
+    return <GSMainAreaComponent widget={this} signal={this._runningChanged} />;
+  }
 
-        // const title = args.title;
-        this._payload = args.payload;
-        this._runningChanged.emit(void 0);
-    }
+  private _notebook: INotebookTracker | null = null;
+  protected translator: ITranslator;
 
-    /**
-     * Handle handler disposed signals.
-     */
-    protected onHandlerDisposed(sender: any, args: void): void {
-        this.handler = null;
-    }
-
-    get payload(): VariableInspector.IVariable[] {
-        return this._payload;
-    }
-
-    get runningChanged(): ISignal<GSWidget, void> {
-        return this._runningChanged;
-    }
-
-    protected render(): JSX.Element {
-        return (
-            <GSMainAreaComponent
-                widget={this}
-                signal={this._runningChanged}
-            />
-        );
-    }
-
-    private _notebook: INotebookTracker | null = null;
-    protected translator: ITranslator;
-
-    private _payload: VariableInspector.IVariable[] = []
-    private _runningChanged = new Signal<this, void>(this);
+  private _payload: VariableInspector.IVariable[] = [];
+  private _runningChanged = new Signal<this, void>(this);
 }
 
 /**
- * Sidebar widget
+ * The namespace for graphscope sidebar component statics.
  */
-export class GSSideBarWidget extends IVariableInspectorWidget {
+export namespace GSSidebarComponents {
+  /**
+   * React properties for graphscope sidebar component.
+   */
+  export interface IProperties {
     /**
-     * Constructs a new GSSideBarWidget.
+     * Command Registry.
      */
-    constructor(commands: CommandRegistry, translator?: ITranslator) {
-        super();
-        this.commands = commands;
-        this.translator = translator || nullTranslator;
-
-        this.id = "gs-sidebar-widget";
-        this.title.caption = "GraphScope Jypyterlab Extension";
-        this.title.icon = gsIcon;
-        this.title.closable = true;
-
-        this.addClass('jp-GSWidget');
-    }
-
-    dispose(): void {
-        if (!this.isDisposed) {
-            this.handler = null;
-            super.dispose();
-        }
-    }
+    commands: CommandRegistry
 
     /**
-     * Handle variable update signals.
+     * The graphscope sidebar widget.
      */
-    protected onInspectorUpdate(
-        sender: any, args: VariableInspector.IVariableInspectorUpdate
-    ): void {
-        if (!this.isAttached) {
-            return;
-        }
-
-        let sessions = new Map<string, GSSessionVariable>();
-
-        // handle `session`
-        args.payload.forEach(v => {
-            if (v.type === "session") {
-                sessions.set(v.props.session_id, { "header": v.name, "items": [] });
-            }
-        });
-
-        // handle `graph`
-        args.payload.forEach(v => {
-            if (v.type === "graph") {
-                let session_id = v.props.session_id;
-                if (!sessions.has(session_id)) {
-                    sessions.set(session_id, { "header": "Default Session", items: [] });
-                }
-                let session = sessions.get(session_id);
-                session.items.push({ header: v.name });
-            }
-        });
-
-        this._payload = [];
-        for (let value of sessions.values()) {
-            this._payload.push(value);
-        }
-
-        this._runningChanged.emit(void 0);
-    }
+    widget: GSSidebarWidget;
 
     /**
-     * Handle handler disposed signals.
+     * Signal to render dom tree.
      */
-    protected onHandlerDisposed(sender: any, args: void): void {
-        this.handler = null;
-    }
+    signal: ISignal<GSSidebarWidget, void>;
 
-    get runningChanged(): ISignal<GSSideBarWidget, void> {
-        return this._runningChanged;
-    }
+    /**
+     *  Jupyterlab translator.
+     */
+    translator?: ITranslator;
+  };
 
-    get payload() {
-        return this._payload;
-    }
+  export interface IState { };
+}
 
-    protected render(): JSX.Element {
+function SectionItem(props: {item: GSVariable.GSAppOrGraphVariable}) {
+  let className = 'jp-gsSidebar-sectionItemLabel';
+
+  const state = props.item.state;
+  if (state !== 'True') {
+    className = 'jp-gsSidebar-sectionItemDisabled';
+  }
+
+  return (
+    <li className='jp-gsSidebar-sectionItem'>
+      <span
+        className={className}
+        title={props.item.type}
+        onClick={() => { console.log('click event: click on ', props.item.name)}}
+      >
+        {props.item.name}
+      </span>
+      <ToolbarButtonComponent
+        className="jp-gsSidebar-sectionItemShutdown"
+        icon={searchIcon}
+        onClick={() => { console.log("click event: search for section item")}}
+        tooltip="detail"
+      />
+    </li>
+  )
+}
+
+function SectionListView(props: {items: GSVariable.GSAppOrGraphVariable[]}) {
+  return (
+    <div className='jp-gsSidebar-section-content'>
+    <ul className='jp-gsSidebar-sectionList'>
+      {props.items.map((item, i) => {
         return (
-            <GSSideBarComponent
-                commands={this.commands}
-                translator={this.translator}
-                widget={this}
-                signal={this._runningChanged}
-            />
-        )
+          <SectionItem
+            item={item}
+          />
+        );
+      })}
+    </ul>
+    </div>
+  )
+}
 
+
+/**
+ * React component of sidebar.
+ */
+class GSSidebarComponent extends React.Component<
+  GSSidebarComponents.IProperties, GSSidebarComponents.IState> {
+  constructor(props: GSSidebarComponents.IProperties) {
+    super(props);
+  }
+
+  render() {
+    const trans = this.props.translator.load("jupyterlab");
+
+    return (
+      <>
+        <div className='jp-gsSidebar-header'>
+          <span className='jp-gsSidebar-headerText'>
+            List of Resources
+          </span>
+          <ToolbarButtonComponent
+            icon={addIcon}
+            onClick={() => { console.log("click event: create a new session") }}
+            tooltip={trans.__("Create a new session")}
+          />
+        </div>
+
+        <UseSignal signal={this.props.signal}>
+          {() => {
+            const elements: React.ReactElement<any>[] = [];
+            const contents: any[] = [];
+
+            this.props.widget.payload.map((sess, i) => {
+              let disabled: boolean = false;
+              if (sess.state === 'closed' || sess.state === 'disconnected') {
+                disabled = true;
+              }
+          
+              contents.push(
+                <CollapsibleSection
+                  key={trans.__('session section')}
+                  header={trans.__(sess.name)}
+                  tooltip='graphscope session'
+                  isOpen={true}
+                  disabled={disabled}
+                  headerElements={
+                    <ToolbarButtonComponent
+                      icon={addIcon}
+                      onClick={() => { console.log('click event: create a new graph on session.'); }}
+                      tooltip="Create a new graph"
+                    />
+                  }
+                >
+                  <SectionListView
+                    items={sess.items}
+                  />
+                </CollapsibleSection>
+              )
+            })
+
+            elements.push(
+              <div className='jp-gsSidebar-content'>
+                {contents}
+              </div>
+            )
+
+            return elements;
+          }}
+        </UseSignal>
+      </>
+    )
+  }
+}
+
+
+/**
+ * The widget for graphscope sidebar.
+ */
+export class GSSidebarWidget extends IVariableInspectorWidget {
+  /**
+   * Constructs a new GSSideBarWidget.
+   */
+  constructor(commands: CommandRegistry, translator?: ITranslator) {
+    super();
+    this.commands = commands;
+    this.translator = translator || nullTranslator;
+
+    const trans = this.translator.load('jupyterlab');
+
+    this.id = trans.__('gs-sidebar-widget');
+    this.title.caption = trans.__('GraphScope Jypyterlab Extension');
+    this.title.icon = gsIcon;
+    this.title.closable = true;
+
+    this.addClass('.jp-gsSidebar-widget');
+  }
+
+  dispose(): void {
+    if (!this.isDisposed) {
+      this.handler = null;
+      super.dispose();
+    }
+  }
+
+  /**
+   * Handle variable update signals.
+   */
+  protected onInspectorUpdate(
+    sender: any,
+    args: VariableInspector.IVariableInspectorUpdate
+  ): void {
+    if (!this.isAttached) {
+      return;
     }
 
-    protected commands: CommandRegistry;
-    protected translator: ITranslator;
+    let sessions = new Map<string, GSVariable.GSSessionVariable>();
 
-    private _payload: any;
-    // private _payload: VariableInspector.IVariable[] = [];
-    private _runningChanged = new Signal<this, void>(this);
+    // handle `session`
+    args.payload.forEach(v => {
+      if (v.type === 'session') {
+        sessions.set(v.props.session_id, { name: v.name, state: v.props.state, items: [] });
+      }
+    });
+
+    // handle `graph`
+    args.payload.forEach(v => {
+      if (v.type === 'graph') {
+        let session_id = v.props.session_id;
+        if (!sessions.has(session_id)) {
+          // always active for default session.
+          sessions.set(session_id, { name: 'Default Session', state: "active", items: [] });
+        }
+        let session = sessions.get(session_id);
+        session.items.push({ name: v.name, type: "graph", state: v.props.state });
+      }
+    });
+
+    this._payload = [];
+    for (let value of sessions.values()) {
+      this._payload.push(value);
+    }
+
+    this._runningChanged.emit(void 0);
+  }
+
+  /**
+   * Handle handler disposed signals.
+   */
+  protected onHandlerDisposed(sender: any, args: void): void {
+    this.handler = null;
+  }
+
+  get runningChanged(): ISignal<GSSidebarWidget, void> {
+    return this._runningChanged;
+  }
+
+  get payload(): GSVariable.GSSessionVariable[] {
+    return this._payload;
+  }
+
+  protected render(): JSX.Element {
+    return (
+      <GSSidebarComponent
+        commands={this.commands}
+        translator={this.translator}
+        widget={this}
+        signal={this._runningChanged}
+      />
+    );
+  }
+
+  public translator: ITranslator;
+  protected commands: CommandRegistry;
+
+  private _payload: GSVariable.GSSessionVariable[] = [];
+  private _runningChanged = new Signal<this, void>(this);
 }

@@ -1,4 +1,4 @@
-.jp-GSWidget {
+.jp-gsSidebar-widget {
   display: flex;
   flex-direction: column;
   min-width: var(--jp-sidebar-min-width);
@@ -10,16 +10,10 @@
   font-size: var(--jp-ui-font-size1);
 }
 
-.jp-GSSideBarContents {
-  display: flex;
-  flex-direction: column;
-  background: var(--jp-layout-color1);
-  color: var(--jp-ui-font-color1);
-  font-size: var(--jp-ui-font-size1);
-  height: 100%;
-}
-
-.jp-GSSideBarContents .jp-stack-panel-header {
+/*
+  sidebar header
+*/
+.jp-gsSidebar-header {
   border-bottom: var(--jp-border-width) solid var(--jp-border-color2);
   flex: 0 0 auto;
   font-size: var(--jp-ui-font-size0);
@@ -30,22 +24,20 @@
   text-transform: uppercase;
 }
 
-.jp-stack-panel-header .jp-ToolbarButtonComponent {
+.jp-gsSidebar-header .jp-gsSidebar-headerText {
+  flex: 1 0 auto;
+  margin: 0 4px;
+}
+
+.jp-gsSidebar-header .jp-ToolbarButtonComponent {
   background-color:rgb(177, 172, 172);
   width: 60px;
 }
 
-.jp-gs-sidebar-content {
-  overflow: auto;
-  overflow-x: hidden;
-}
-
 /*
-  Section headers
+  sidebar content
 */
-
-
-.jp-GSSideBarContents .jp-gs-section-header {
+.jp-gsSidebar-content .jp-gsSidebar-section-header {
   display: flex;
   justify-content: space-between;
   flex: 0 0 auto;
@@ -58,43 +50,47 @@
   padding: 4px;
 }
 
-.jp-GSSideBarContents.jp-gs-section-header > .jp-ToolbarButtonComponent {
+
+.jp-gsSidebar-content.jp-gsSidebar-section-header > .jp-ToolbarButtonComponent {
   padding: 0 2px;
   border: 1px solid transparent;
   background-color: var(--jp-layout-color1);
   color: var(--jp-ui-font-color1);
 }
 
-.jp-GSSideBarContents
-  .jp-gs-section-header
-  .jp-gs-section-headerText {
+.jp-gsSidebar-content
+  .jp-gsSidebar-section-header
+  .jp-gsSidebar-section-headerText {
   flex: 1 0 auto;
   margin: 0 4px;
 }
 
-.jp-GSSideBarContents
-  .jp-gs-section-header
-  .jp-gs-section-headerTextDisabled {
+.jp-gsSidebar-content
+  .jp-gsSidebar-section-header
+  .jp-gsSidebar-section-headerTextDisabled {
   flex: 1 0 auto;
   margin: 0 4px;
   color: var(--jp-layout-color3);
 }
 
-.jp-gs-section-content {
+/*
+  sidebar section content
+*/
+.jp-gsSidebar-section-content {
   color: var(--jp-ui-font-color1);
   font-size: var(--jp-ui-font-size1);
   font-weight: normal;
   margin: 8px 8px 8px 40px;
 }
 
-.jp-RunningSessions-sectionList {
+.jp-gsSidebar-sectionList {
   margin: 0;
   padding: 0;
   list-style-type: none;
 }
 
 
-.jp-RunningSessions-item {
+.jp-gsSidebar-sectionItem {
   display: flex;
   flex-direction: row;
   color: var(--jp-ui-font-color1);
@@ -103,35 +99,39 @@
   padding: 0 1px;
 }
 
-.jp-RunningSessions-item:hover {
+.jp-gsSidebar-sectionItem:hover {
   background-color: var(--jp-layout-color2);
 }
 
-.jp-RunningSessions-itemLabel {
-  font-size: var(--jp-ui-font-size1);
+.jp-gsSidebar-sectionItemLabel {
+  font-size: var(--jp-ui-font-size0);
   flex: 1 1 55%;
   padding: 0 4px;
+  letter-spacing: 1px;
+  font-weight: 500;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
 }
 
-.jp-RunningSessions-itemLabelDisabled {
-  font-size: var(--jp-ui-font-size1);
+.jp-gsSidebar-sectionItemDisabled {
+  font-size: var(--jp-ui-font-size0);
   color: var(--jp-layout-color3);
   flex: 1 1 55%;
   padding: 0 4px;
+  letter-spacing: 1px;
+  font-weight: 500;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
 }
 
-.jp-RunningSessions-itemLabel:focus {
+.jp-gsSidebar-sectionItemLabel:focus {
   background-color: var(--jp-layout-color2);
 }
 
 
-.jp-RunningSessions-itemDetail {
+.jp-gsSidebar-sectionItemDetail {
   color: var(--jp-ui-font-color3);
   font-size: var(--jp-ui-font-size8);
   flex: 1 1 45%;
@@ -141,18 +141,18 @@
   white-space: nowrap;
 }
 
-.jp-RunningSessions-item .jp-RunningSessions-itemShutdown {
+.jp-gsSidebar-sectionItem .jp-gsSidebar-sectionItemShutdown {
   border-radius: 0;
 }
 
-.jp-RunningSessions-item:not(:hover) .jp-RunningSessions-itemShutdown {
+.jp-gsSidebar-sectionItem:not(:hover) .jp-gsSidebar-sectionItemShutdown {
   visibility: hidden;
 
   /* display: none; */
 }
 
-.jp-RunningSessions-sectionList
-  .jp-RunningSessions-item
-  .jp-Button.jp-RunningSessions-itemShutdown:hover {
+.jp-gsSidebar-sectionList
+  .jp-gsSidebar-sectionItem
+  .jp-Button.jp-gsSidebar-sectionItemShutdown:hover {
   background: var(--jp-layout-color3);
 }

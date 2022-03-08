@@ -5,7 +5,7 @@
     "context": [
       {
         "command": "gs-jupyterlab/sidebar-item-context-menu:open",
-        "selector": ".jp-RunningSessions-item",
+        "selector": ".jp-gsSidebar-sectionItem",
         "rank": 0
       }
     ]

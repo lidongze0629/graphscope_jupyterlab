@@ -25,7 +25,7 @@ import { GSVariableManager, IGSVariableManager } from './manager';
 
 import { Languages } from './scripts';
 
-import { GSSideBarWidget } from './widget';
+import { GSSidebarWidget } from './widget';
 
 /**
  * A service providing variable inspection.
@@ -54,7 +54,7 @@ const variableinspector: JupyterFrontEndPlugin<IGSVariableManager> = {
 
     // add left sidebar with rank 501
     // rank(501-899): reserved for third-party extensions.
-    const gsSideBarWidget = new GSSideBarWidget(commands);
+    const gsSideBarWidget = new GSSidebarWidget(commands, translator);
     labShell.add(gsSideBarWidget, 'left', { rank: 501 });
 
     if (restorer) {

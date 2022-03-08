@@ -10,7 +10,7 @@ import { CommandRegistry } from '@lumino/commands';
 
 export namespace CommandIDs {
     // graphscope sidebar item context menu
-    // selector: '.jp-RunningSessions-item'
+    // selector: '.jp-gsSidebar-sectionItem'
     export const sidebar_item_open = 'gs-jupyterlab/sidebar-item-context-menu:open';
 } 
 
