@@ -52,6 +52,7 @@
     "@jupyterlab/inspector": "^3.2.9",
     "@jupyterlab/launcher": "^3.2.9",
     "@jupyterlab/notebook": "^3.2.9",
+    "@jupyterlab/statedb": "^3.3.0",
     "@jupyterlab/translation": "^3.2.9",
     "@jupyterlab/ui-components": "^3.2.9",
     "@lumino/coreutils": "^1.12.0",

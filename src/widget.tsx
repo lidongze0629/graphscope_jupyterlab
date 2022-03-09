@@ -12,9 +12,11 @@ import { ITranslator, nullTranslator } from '@jupyterlab/translation';
 
 import { ISignal, Signal } from '@lumino/signaling';
 
-import { INotebookTracker } from '@jupyterlab/notebook';
+import { CommandIDs } from './common';
 
-import { CodeCell, MarkdownCell } from '@jupyterlab/cells';
+// import { INotebookTracker } from '@jupyterlab/notebook';
+
+// import { CodeCell, MarkdownCell } from '@jupyterlab/cells';
 
 import {
   caretDownIcon,
@@ -34,7 +36,6 @@ import '@grapecity/wijmo.styles/wijmo.css';
 
 import 'bootstrap/dist/css/bootstrap.css';
 
-// import * as wjNav from '@grapecity/wijmo.react.nav';
 
 /**
  * Icons with custom styling bound.
@@ -98,6 +99,7 @@ export namespace GSVariable {
   }
 }
 
+
 /**
  * The namespace for collapsible section statics.
  */
@@ -153,6 +155,7 @@ export namespace CollapsibleSection {
     isOpen: boolean;
   }
 }
+
 
 export class CollapsibleSection extends React.Component<
   CollapsibleSection.IProperties,
@@ -231,43 +234,13 @@ export class CollapsibleSection extends React.Component<
   }
 }
 
-/**
- * remain for mainarea component
- */
-function Item(props: { name: string; type: string; content: string }) {
-  return (
-    <li>
-      <span>
-        {props.name} {props.type} {props.content}
-      </span>
-    </li>
-  );
-}
-
-/**
- * remain for mainarea component
- */
-function ListView(props: { payload: VariableInspector.IVariable[] }) {
-  return (
-    <ul>
-      {props.payload.map((variable, i) => {
-        return (
-          <Item
-            name={variable.name}
-            type={variable.type}
-            content={variable.content}
-          />
-        );
-      })}
-    </ul>
-  );
-}
 
 /**
  * Main area react component
  *
  * @return The react component
  */
+/*
 function GSMainAreaComponent(props: {
   widget: GSWidget;
   signal: ISignal<GSWidget, void>;
@@ -294,6 +267,8 @@ function GSMainAreaComponent(props: {
     </>
   );
 }
+*/
+
 
 export abstract class IVariableInspectorWidget
   extends ReactWidget
@@ -330,9 +305,52 @@ export abstract class IVariableInspectorWidget
   private _handler: VariableInspector.IInspectable | null = null;
 }
 
+
+/**
+ * The widget for operate graph.
+ */
+export class GSGraphOpWidget extends ReactWidget {
+  /**
+   * Constructs a new GSGraphOpWidget.
+   */
+  constructor(meta: { [name: string]: any }, commands: CommandRegistry, translator?: ITranslator) {
+    super();
+    this.commands = commands;
+    this.translator = translator || nullTranslator;
+    this._meta = meta;
+
+    const trans = this.translator.load('jupyterlab');
+    this.id = trans.__('gs-graphop-widget');
+    this.title.label = trans.__('Graph Schema');
+    this.title.icon = gsIcon;
+    this.title.closable = true;
+  }
+
+  get meta(): { [name: string]: any } {
+    return this._meta;
+  }
+
+  render() {
+    return (
+      <div>
+      </div>
+    )
+  }
+
+  public translator: ITranslator;
+  protected commands: CommandRegistry;
+
+  // current meta info: {
+  //  'session': <session_variable_name>
+  // }
+  private _meta: { [name: string]: any } = {};
+}
+
+
 /**
  * Main area widget
  */
+/*
 export class GSWidget extends IVariableInspectorWidget {
   constructor(translator?: ITranslator) {
     super();
@@ -384,9 +402,6 @@ export class GSWidget extends IVariableInspectorWidget {
     this._runningChanged.emit(void 0);
   }
 
-  /**
-   * Handle handler disposed signals.
-   */
   protected onHandlerDisposed(sender: any, args: void): void {
     this.handler = null;
   }
@@ -409,6 +424,8 @@ export class GSWidget extends IVariableInspectorWidget {
   private _payload: VariableInspector.IVariable[] = [];
   private _runningChanged = new Signal<this, void>(this);
 }
+*/
+
 
 /**
  * The namespace for graphscope sidebar component statics.
@@ -441,6 +458,7 @@ export namespace GSSidebarComponents {
 
   export interface IState { };
 }
+
 
 function SectionItem(props: { translator: ITranslator, item: GSVariable.GSAppOrGraphVariable }) {
   const trans = props.translator.load('jupyterlab');
@@ -476,6 +494,7 @@ function SectionItem(props: { translator: ITranslator, item: GSVariable.GSAppOrG
     </li>
   )
 }
+
 
 function SectionListView(props: { translator: ITranslator, items: GSVariable.GSAppOrGraphVariable[] }) {
   return (
@@ -515,7 +534,7 @@ class GSSidebarComponent extends React.Component<
           </span>
           <ToolbarButtonComponent
             icon={addIcon}
-            onClick={() => { console.log("click event: create a new session") }}
+            onClick={() => { console.log("click event: create a new session."); }}
             tooltip={trans.__("Create a new session")}
           />
         </div>
@@ -541,7 +560,7 @@ class GSSidebarComponent extends React.Component<
                   headerElements={
                     <ToolbarButtonComponent
                       icon={addIcon}
-                      onClick={() => { console.log('click event: create a new graph on session.'); }}
+                      onClick={() => { this.props.commands.execute(CommandIDs.open, { sess: sess.name }); }}
                       tooltip="Create a new graph"
                     />
                   }

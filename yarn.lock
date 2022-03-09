@@ -640,6 +640,17 @@
     "@lumino/properties" "^1.2.3"
     "@lumino/signaling" "^1.4.3"
 
+"@jupyterlab/statedb@^3.3.0":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@jupyterlab/statedb/-/statedb-3.3.0.tgz#598ef1a53b1a411d5688ef9d3d9392b5f5f5fdfd"
+  integrity sha512-NBoJ32sRI92qyqNwyo0ckVTmnoUK643GLlVCNzUk+xRGf4SNTQ+Hn29ge8lBFju0NSAgCGn2JConj7ry+btfmw==
+  dependencies:
+    "@lumino/commands" "^1.12.0"
+    "@lumino/coreutils" "^1.5.3"
+    "@lumino/disposable" "^1.4.3"
+    "@lumino/properties" "^1.2.3"
+    "@lumino/signaling" "^1.4.3"
+
 "@jupyterlab/statusbar@^3.2.9":
   version "3.2.9"
   resolved "https://registry.npmjs.org/@jupyterlab/statusbar/-/statusbar-3.2.9.tgz"

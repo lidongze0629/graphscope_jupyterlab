@@ -5,15 +5,21 @@ import {
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
 
-// import { ICommandPalette, WidgetTracker } from '@jupyterlab/apputils';
+import {
+  ICommandPalette,
+  MainAreaWidget,
+  WidgetTracker,
+  showDialog,
+  Dialog
+} from '@jupyterlab/apputils';
 
-import { ICommandPalette } from '@jupyterlab/apputils';
+import { ReadonlyJSONObject } from '@lumino/coreutils';
 
 import { ITranslator } from '@jupyterlab/translation';
 
 import { INotebookTracker, NotebookPanel } from '@jupyterlab/notebook';
 
-// import { CommandIDs, gsIcon, PALETTE_CATEGORY, NAMESPACE } from './common';
+import { CommandIDs, gsIcon, NAMESPACE } from './common';
 
 import { ContextMenuManager } from './contextmenu';
 
@@ -21,11 +27,13 @@ import { VariableInspectionHandler } from './handler';
 
 import { KernelConnector } from './kernelconnector';
 
+import { IStateDB } from '@jupyterlab/statedb';
+
 import { GSVariableManager, IGSVariableManager } from './manager';
 
 import { Languages } from './scripts';
 
-import { GSSidebarWidget } from './widget';
+import { GSSidebarWidget, GSGraphOpWidget } from './widget';
 
 /**
  * A service providing variable inspection.
@@ -33,21 +41,76 @@ import { GSSidebarWidget } from './widget';
 const variableinspector: JupyterFrontEndPlugin<IGSVariableManager> = {
   id: '@graphscope/variableinspector',
   autoStart: true,
-  requires: [ILabShell],
+  requires: [ILabShell, IStateDB],
   optional: [ICommandPalette, ILayoutRestorer, ITranslator],
   provides: IGSVariableManager,
   activate: (
     app: JupyterFrontEnd,
     labShell: ILabShell,
+    statedb: IStateDB,
     palette: ICommandPalette | null,
     restorer: ILayoutRestorer | null,
     translator: ITranslator | null
   ): IGSVariableManager => {
     const { commands } = app;
+    const trans = translator.load('jupyterlab');
 
     // context menu manager
     const contextMenuManager = new ContextMenuManager(commands, translator);
     contextMenuManager.init();
+
+    // track and restore the widget state
+    const tracker = new WidgetTracker<MainAreaWidget<GSGraphOpWidget>>({
+      namespace: NAMESPACE
+    });
+    // register to command system
+    let gsGraphOpWidget: MainAreaWidget<GSGraphOpWidget>;
+    const command = CommandIDs.open;
+    commands.addCommand(command, {
+      label: trans.__('Graph Schema'),
+      icon: gsIcon,
+      execute: args => {
+        app.restored
+          .then(() => statedb.fetch('@graphscope/variableinspector'))
+          .then(value => {
+            let sess: string;
+            if (args !== null && 'sess' in args) {
+              sess = args['sess'].toString();
+            } else {
+              sess = (value as ReadonlyJSONObject)['sess'] as string;
+            }
+
+            if (!gsGraphOpWidget || gsGraphOpWidget.isDisposed) {
+              gsGraphOpWidget = new MainAreaWidget({
+                content: new GSGraphOpWidget(
+                  { sess: sess },
+                  commands,
+                  translator
+                )
+              });
+              // track the panel
+              tracker.add(gsGraphOpWidget);
+            }
+
+            if (gsGraphOpWidget.isAttached) {
+              if (gsGraphOpWidget.content.meta['sess'] !== sess) {
+                showDialog({
+                  title: trans.__('WARNING'),
+                  body: trans.__(
+                    `The graph schema panel already exists with different session "${gsGraphOpWidget.content.meta['sess']}". Please close it first.`
+                  ),
+                  buttons: [Dialog.cancelButton()]
+                }).catch(e => console.log(e));
+                return;
+              }
+            } else {
+              statedb.save('@graphscope/variableinspector', { sess });
+              labShell.add(gsGraphOpWidget, 'main', { mode: 'split-right' });
+            }
+            labShell.activateById(gsGraphOpWidget.id);
+          });
+      }
+    });
 
     // kernel variable manager
     const manager = new GSVariableManager();
@@ -60,6 +123,13 @@ const variableinspector: JupyterFrontEndPlugin<IGSVariableManager> = {
     if (restorer) {
       // Add the sidebar to the application restorer
       restorer.add(gsSideBarWidget, '@graphscope/sidebar:plugin');
+
+      // Add the graph operation widget to the application restorer
+      restorer.restore(tracker, {
+        command,
+        args: () => null,
+        name: () => NAMESPACE
+      });
     }
 
     manager.registePanel(gsSideBarWidget);
@@ -71,7 +141,7 @@ const variableinspector: JupyterFrontEndPlugin<IGSVariableManager> = {
  * An extension that registers notebooks for gs variable inspection.
  */
 const notebooks: JupyterFrontEndPlugin<void> = {
-  id: '@grgraphscope/plugin:notebooks',
+  id: '@graphscope/plugin:notebooks',
   autoStart: true,
   requires: [IGSVariableManager, INotebookTracker, ILabShell],
   activate: (
