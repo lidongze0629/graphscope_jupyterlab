@@ -6,6 +6,8 @@ import {
 
 import { CommandRegistry } from '@lumino/commands';
 
+import { showDialog, Dialog } from '@jupyterlab/apputils';
+
 import { ITranslator, nullTranslator } from '@jupyterlab/translation';
 
 import { ISignal, Signal } from '@lumino/signaling';
@@ -440,7 +442,9 @@ export namespace GSSidebarComponents {
   export interface IState { };
 }
 
-function SectionItem(props: { item: GSVariable.GSAppOrGraphVariable }) {
+function SectionItem(props: { translator: ITranslator, item: GSVariable.GSAppOrGraphVariable }) {
+  const trans = props.translator.load('jupyterlab');
+
   let className = 'jp-gsSidebar-sectionItemLabel';
 
   const state = props.item.state;
@@ -460,20 +464,27 @@ function SectionItem(props: { item: GSVariable.GSAppOrGraphVariable }) {
       <ToolbarButtonComponent
         className="jp-gsSidebar-sectionItemShutdown"
         icon={searchIcon}
-        onClick={() => { console.log("click event: search for section item") }}
+        onClick={() => {
+          showDialog({
+            title: trans.__(props.item.name),
+            body: trans.__(props.item.content),
+            buttons: [Dialog.okButton()]
+          }).catch(e => console.log(e));
+        }}
         tooltip="detail"
       />
     </li>
   )
 }
 
-function SectionListView(props: { items: GSVariable.GSAppOrGraphVariable[] }) {
+function SectionListView(props: { translator: ITranslator, items: GSVariable.GSAppOrGraphVariable[] }) {
   return (
     <div className='jp-gsSidebar-section-content'>
       <ul className='jp-gsSidebar-sectionList'>
         {props.items.map((item, i) => {
           return (
             <SectionItem
+              translator={props.translator}
               item={item}
             />
           );
@@ -536,6 +547,7 @@ class GSSidebarComponent extends React.Component<
                   }
                 >
                   <SectionListView
+                    translator={this.props.translator}
                     items={sess.items}
                   />
                 </CollapsibleSection>
