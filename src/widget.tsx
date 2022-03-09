@@ -67,6 +67,10 @@ export namespace GSVariable {
      * State, loaded or unloaded.
      */
     state: string;
+    /**
+     * output of `__str__` in python class.
+     */
+    content: string;
   }
 
   /**
@@ -81,6 +85,10 @@ export namespace GSVariable {
      * State, active、disconnected or closed.
      */
     state: string;
+    /**
+     * output of `__str__` in python class.
+     */
+    content: string;
     /**
      * Resource exists in this session.
      */
@@ -444,7 +452,7 @@ function SectionItem(props: { item: GSVariable.GSAppOrGraphVariable }) {
     <li className='jp-gsSidebar-sectionItem'>
       <span
         className={className}
-        title={props.item.type}
+        title={"graphscope " + props.item.type}
         onClick={() => { console.log('click event: click on ', props.item.name) }}
       >
         {props.item.name}
@@ -516,7 +524,7 @@ class GSSidebarComponent extends React.Component<
                 <CollapsibleSection
                   key={trans.__('session section')}
                   header={trans.__(sess.name)}
-                  tooltip='graphscope session'
+                  tooltip={sess.content}
                   isOpen={true}
                   disabled={disabled}
                   headerElements={
@@ -594,7 +602,7 @@ export class GSSidebarWidget extends IVariableInspectorWidget {
     // handle `session`
     args.payload.forEach(v => {
       if (v.type === 'session') {
-        sessions.set(v.props.session_id, { name: v.name, state: v.props.state, items: [] });
+        sessions.set(v.props.session_id, { name: v.name, content: v.content, state: v.props.state, items: [] });
       }
     });
 
@@ -604,7 +612,7 @@ export class GSSidebarWidget extends IVariableInspectorWidget {
         let session_id = v.props.session_id;
         if (sessions.has(session_id)) {
           let session = sessions.get(session_id);
-          session.items.push({ name: v.name, type: "graph", state: v.props.state });
+          session.items.push({ name: v.name, content: v.content, type: "graph", state: v.props.state });
         }
       }
     });
