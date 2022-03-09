@@ -82,6 +82,22 @@ def _gs_jupyterlab_inspect_variable():
     gs_variable_dict_list = [
         _parse(_v) for _v in values if _belongs_to_gs(_v)
     ]
+
+    # handle default session
+    if graphscope.has_default_session():
+        _sess = graphscope.get_default_session()
+        gs_variable_dict_list.append(
+          {
+            "name": "Default Session",
+            "content": str(_gs_jupyterlab_getcontentof(_sess)),
+            "type": "session",
+            "props": {
+              "session_id": _sess.session_id,
+              "state": _sess.info["status"]
+            }
+          }
+        )
+
     return json.dumps(gs_variable_dict_list)
 
 def _gs_jupyterlab_delete_variable(x):

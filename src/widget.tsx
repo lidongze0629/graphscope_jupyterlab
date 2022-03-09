@@ -602,12 +602,10 @@ export class GSSidebarWidget extends IVariableInspectorWidget {
     args.payload.forEach(v => {
       if (v.type === 'graph') {
         let session_id = v.props.session_id;
-        if (!sessions.has(session_id)) {
-          // always active for default session.
-          sessions.set(session_id, { name: 'Default Session', state: "active", items: [] });
+        if (sessions.has(session_id)) {
+          let session = sessions.get(session_id);
+          session.items.push({ name: v.name, type: "graph", state: v.props.state });
         }
-        let session = sessions.get(session_id);
-        session.items.push({ name: v.name, type: "graph", state: v.props.state });
       }
     });
 
