@@ -91,7 +91,7 @@ export namespace GSVariable {
 /**
  * The namespace for collapsible section statics.
  */
- export namespace CollapsibleSection {
+export namespace CollapsibleSection {
   /**
    * React properties for collapsible section component.
    */
@@ -432,7 +432,7 @@ export namespace GSSidebarComponents {
   export interface IState { };
 }
 
-function SectionItem(props: {item: GSVariable.GSAppOrGraphVariable}) {
+function SectionItem(props: { item: GSVariable.GSAppOrGraphVariable }) {
   let className = 'jp-gsSidebar-sectionItemLabel';
 
   const state = props.item.state;
@@ -445,32 +445,32 @@ function SectionItem(props: {item: GSVariable.GSAppOrGraphVariable}) {
       <span
         className={className}
         title={props.item.type}
-        onClick={() => { console.log('click event: click on ', props.item.name)}}
+        onClick={() => { console.log('click event: click on ', props.item.name) }}
       >
         {props.item.name}
       </span>
       <ToolbarButtonComponent
         className="jp-gsSidebar-sectionItemShutdown"
         icon={searchIcon}
-        onClick={() => { console.log("click event: search for section item")}}
+        onClick={() => { console.log("click event: search for section item") }}
         tooltip="detail"
       />
     </li>
   )
 }
 
-function SectionListView(props: {items: GSVariable.GSAppOrGraphVariable[]}) {
+function SectionListView(props: { items: GSVariable.GSAppOrGraphVariable[] }) {
   return (
     <div className='jp-gsSidebar-section-content'>
-    <ul className='jp-gsSidebar-sectionList'>
-      {props.items.map((item, i) => {
-        return (
-          <SectionItem
-            item={item}
-          />
-        );
-      })}
-    </ul>
+      <ul className='jp-gsSidebar-sectionList'>
+        {props.items.map((item, i) => {
+          return (
+            <SectionItem
+              item={item}
+            />
+          );
+        })}
+      </ul>
     </div>
   )
 }
@@ -511,7 +511,7 @@ class GSSidebarComponent extends React.Component<
               if (sess.state === 'closed' || sess.state === 'disconnected') {
                 disabled = true;
               }
-          
+
               contents.push(
                 <CollapsibleSection
                   key={trans.__('session section')}

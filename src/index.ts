@@ -41,7 +41,7 @@ const variableinspector: JupyterFrontEndPlugin<IGSVariableManager> = {
     labShell: ILabShell,
     palette: ICommandPalette | null,
     restorer: ILayoutRestorer | null,
-    translator: ITranslator | null,
+    translator: ITranslator | null
   ): IGSVariableManager => {
     const { commands } = app;
 
