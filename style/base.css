@@ -34,6 +34,7 @@
   width: 60px;
 }
 
+
 /*
   sidebar content
 */
@@ -154,4 +155,41 @@
   .jp-gsSidebar-sectionItem
   .jp-Button.jp-gsSidebar-sectionItemShutdown:hover {
   background: var(--jp-layout-color3);
+}
+
+
+/*
+  graph schema operation content
+*/
+.jp-gsGraphOp-content {
+  display: flex;
+  flex-direction: column;
+  min-width: var(--jp-sidebar-min-width);
+  color: var(--jp-ui-font-color1);
+  background: var(--jp-layout-color1);
+
+  /* This is needed so that all font sizing of children done in ems is
+   * relative to this base size */
+  font-size: var(--jp-ui-font-size1);
+}
+
+.jp-gsGraphOp-content .jp-gsGraphOp-header {
+  flex: 0 0 auto;
+  font-size: var(--jp-ui-font-size0);
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin: 0;
+  padding: 8px 12px;
+  text-transform: uppercase;
+}
+
+.jp-gsGraphOp-content .jp-gsGraphOp-header .jp-gsGraphOp-headerText {
+  flex: 1 0 auto;
+  margin: 0 10px;
+}
+
+.jp-gsGraphOp-content .jp-gsGraphOp-header > .jp-ToolbarButtonComponent {
+  background-color:rgb(172, 177, 174);
+  width: 60px;
+  margin: 10px 50%;
 }

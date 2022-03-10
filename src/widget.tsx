@@ -270,6 +270,149 @@ function GSMainAreaComponent(props: {
 */
 
 
+/**
+ * The namespace for graphscope graph schema operation component statics.
+ */
+export namespace GSGraphOpComponents {
+  /**
+   * React properties for graphscope sidebar component.
+   */
+  export interface IProperties {
+    /**
+     * Command Registry.
+     */
+    commands: CommandRegistry
+
+    /**
+     * The graphscope graph operation widget.
+     */
+    widget: GSGraphOpWidget;
+
+    /**
+     * Signal to render dom tree.
+     */
+    signal: ISignal<GSGraphOpWidget, void>;
+
+    /**
+     *  Jupyterlab translator.
+     */
+    translator?: ITranslator;
+  };
+
+  export interface IState { };
+}
+
+
+/**
+ * React component of graph operation widget.
+ */
+class GSGraphOpComponent extends React.Component<
+  GSGraphOpComponents.IProperties, GSGraphOpComponents.IState> {
+  constructor(props: GSGraphOpComponents.IProperties) {
+    super(props);
+  }
+
+  render () {
+    const trans = this.props.translator.load('jupyterlab');
+
+    return (
+        <UseSignal signal={this.props.signal}>
+          {() => {
+            return (
+              <>
+                <div className='jp-gsGraphOp-content'>
+                  <div className='jp-gsGraphOp-header'>
+                    <span className='jp-gsGraphOp-headerText'>
+                      Vertex List
+                    </span>
+
+                    <ToolbarButtonComponent
+                      icon={addIcon}
+                      onClick={() => { console.log('click event: create a new session.'); }}
+                      tooltip={trans.__('create vertex')}
+                    />
+                  </div>
+                </div>
+
+                <div className='jp-gsGraphOp-content'>
+                  <div className='jp-gsGraphOp-header'>
+                    <span className='jp-gsGraphOp-headerText'>
+                      Edge List
+                    </span>
+
+                    <ToolbarButtonComponent
+                      icon={addIcon}
+                      // label='Create'
+                      // iconLabel='Create'
+                      onClick={() => { console.log('click event: create a new session.'); }}
+                      tooltip={trans.__('create edge')}
+                    />
+                  </div>
+                </div>
+              </>
+            )
+          }}
+        </UseSignal>
+    )
+  }
+}
+
+
+/**
+ * The widget for operate graph.
+ */
+export class GSGraphOpWidget extends ReactWidget {
+  /**
+   * Constructs a new GSGraphOpWidget.
+   */
+  constructor(meta: { [name: string]: any }, commands: CommandRegistry, translator?: ITranslator) {
+    super();
+    this.commands = commands;
+    this.translator = translator || nullTranslator;
+    this._meta = meta;
+
+    const trans = this.translator.load('jupyterlab');
+    this.id = trans.__('gs-graphop-widget');
+    this.title.label = trans.__('Graph Schema ' + '(' + this._meta['sess'] + ')');
+    this.title.icon = gsIcon;
+    this.title.closable = true;
+  }
+
+  get meta(): { [name: string]: any } {
+    return this._meta;
+  }
+
+  get runnningChanged(): ISignal<GSGraphOpWidget, void> {
+    return this._runningChanged;
+  }
+
+  render() {
+    return (
+      <GSGraphOpComponent
+        commands={this.commands}
+        translator={this.translator}
+        widget={this}
+        signal={this._runningChanged}
+      />
+    )
+  }
+
+  public translator: ITranslator;
+  protected commands: CommandRegistry;
+
+  // current meta info: {
+  //  'session': <session_variable_name>
+  // }
+  private _meta: { [name: string]: any } = {};
+  private _runningChanged = new Signal<this, void>(this);
+}
+
+
+/**
+ * Abstract class for variable inspector.
+ *
+ * Any widget inherits this class could interactive with the kernel.
+ */
 export abstract class IVariableInspectorWidget
   extends ReactWidget
   implements IVariableInspector {
@@ -304,127 +447,6 @@ export abstract class IVariableInspectorWidget
 
   private _handler: VariableInspector.IInspectable | null = null;
 }
-
-
-/**
- * The widget for operate graph.
- */
-export class GSGraphOpWidget extends ReactWidget {
-  /**
-   * Constructs a new GSGraphOpWidget.
-   */
-  constructor(meta: { [name: string]: any }, commands: CommandRegistry, translator?: ITranslator) {
-    super();
-    this.commands = commands;
-    this.translator = translator || nullTranslator;
-    this._meta = meta;
-
-    const trans = this.translator.load('jupyterlab');
-    this.id = trans.__('gs-graphop-widget');
-    this.title.label = trans.__('Graph Schema');
-    this.title.icon = gsIcon;
-    this.title.closable = true;
-  }
-
-  get meta(): { [name: string]: any } {
-    return this._meta;
-  }
-
-  render() {
-    return (
-      <div>
-      </div>
-    )
-  }
-
-  public translator: ITranslator;
-  protected commands: CommandRegistry;
-
-  // current meta info: {
-  //  'session': <session_variable_name>
-  // }
-  private _meta: { [name: string]: any } = {};
-}
-
-
-/**
- * Main area widget
- */
-/*
-export class GSWidget extends IVariableInspectorWidget {
-  constructor(translator?: ITranslator) {
-    super();
-
-    this.id = 'gs-mainarea-widget';
-    this.title.icon = gsIcon;
-    this.title.closable = true;
-
-    this.translator = translator || nullTranslator;
-  }
-
-  tempMethodForInsertCodeIntoNotebookCell(code: string): void {
-    let cell = this._notebook.activeCell;
-    if (cell === null) {
-      return;
-    }
-    if (cell instanceof MarkdownCell) {
-      cell.editor.replaceSelection('```' + '\n' + code + '\n```');
-    } else if (cell instanceof CodeCell) {
-      cell.editor.replaceSelection(code);
-    }
-  }
-
-  get notebook(): INotebookTracker | null {
-    return this._notebook;
-  }
-
-  set notebook(nb: INotebookTracker | null) {
-    this._notebook = nb;
-  }
-
-  dispose(): void {
-    if (!this.isDisposed) {
-      this.handler = null;
-      super.dispose();
-    }
-  }
-
-  protected onInspectorUpdate(
-    sender: any,
-    args: VariableInspector.IVariableInspectorUpdate
-  ): void {
-    if (!this.isAttached) {
-      return;
-    }
-
-    // const title = args.title;
-    this._payload = args.payload;
-    this._runningChanged.emit(void 0);
-  }
-
-  protected onHandlerDisposed(sender: any, args: void): void {
-    this.handler = null;
-  }
-
-  get payload(): VariableInspector.IVariable[] {
-    return this._payload;
-  }
-
-  get runningChanged(): ISignal<GSWidget, void> {
-    return this._runningChanged;
-  }
-
-  protected render(): JSX.Element {
-    return <GSMainAreaComponent widget={this} signal={this._runningChanged} />;
-  }
-
-  private _notebook: INotebookTracker | null = null;
-  protected translator: ITranslator;
-
-  private _payload: VariableInspector.IVariable[] = [];
-  private _runningChanged = new Signal<this, void>(this);
-}
-*/
 
 
 /**
@@ -524,7 +546,7 @@ class GSSidebarComponent extends React.Component<
   }
 
   render() {
-    const trans = this.props.translator.load("jupyterlab");
+    const trans = this.props.translator.load('jupyterlab');
 
     return (
       <>
@@ -534,8 +556,8 @@ class GSSidebarComponent extends React.Component<
           </span>
           <ToolbarButtonComponent
             icon={addIcon}
-            onClick={() => { console.log("click event: create a new session."); }}
-            tooltip={trans.__("Create a new session")}
+            onClick={() => { console.log('click event: create a new session.'); }}
+            tooltip={trans.__('Create a new session')}
           />
         </div>
 
@@ -561,7 +583,7 @@ class GSSidebarComponent extends React.Component<
                     <ToolbarButtonComponent
                       icon={addIcon}
                       onClick={() => { this.props.commands.execute(CommandIDs.open, { sess: sess.name }); }}
-                      tooltip="Create a new graph"
+                      tooltip='Create a new graph'
                     />
                   }
                 >
