@@ -23,7 +23,9 @@ import {
   caretRightIcon,
   searchIcon,
   addIcon,
-  Collapse
+  editIcon,
+  closeIcon,
+  Collapse,
 } from '@jupyterlab/ui-components';
 
 import React from 'react';
@@ -32,10 +34,7 @@ import { gsIcon } from './common';
 
 import { IVariableInspector, VariableInspector } from './variableinspector';
 
-import '@grapecity/wijmo.styles/wijmo.css';
-
 import 'bootstrap/dist/css/bootstrap.css';
-
 
 /**
  * Icons with custom styling bound.
@@ -269,6 +268,102 @@ function GSMainAreaComponent(props: {
 }
 */
 
+/**
+ * The namespace for gs graph builder.
+ */
+namespace GSGraphBuilderComponents {
+  export interface IProperties { }
+
+  export interface IVertexProperties { }
+
+  export interface IVertexState {
+    label: string;
+
+    location: string;
+
+    oid_type: string;
+
+    properties: IVertexProperties[];
+  }
+}
+
+
+class GSVertexBuilderComponent extends React.Component<
+  GSGraphBuilderComponents.IProperties, GSGraphBuilderComponents.IVertexState> {
+  constructor(props: GSGraphBuilderComponents.IProperties) {
+    super(props);
+
+    this.state = {
+      label: "",
+      oid_type: "",
+      location: "",
+      properties: []
+    }
+  }
+
+  handleChange(event: any): void {
+    const target = event.target;
+    const value = target.value;
+    const name = target.name;
+
+    console.log(name, value, target);
+
+    if (name === 'label') {
+      this.setState({ label: value });
+    } else if (name === 'oid_type') {
+      console.log("set oid_type: ", value);
+      this.setState({ oid_type: value });
+    } else if (name === 'location') {
+      this.setState({ location: value });
+    } else if (name === 'property') {
+      // todo
+    }
+  }
+
+  addVertex(): void {
+    console.log(this.state);
+  }
+
+  render(): React.ReactNode {
+    return (
+      <div className='jp-gsGraphOp-section-build-vertex'>
+        <label>
+          Label:
+          <input
+            name='label'
+            type='text'
+            value={this.state.label}
+            onChange={this.handleChange.bind(this)}
+          />
+        </label>
+        <br />
+        <label>
+          OID Type:
+          <select name='oid_type' value={this.state.oid_type} onChange={this.handleChange.bind(this)}>
+            <option value="string">String</option>
+            <option value="int">Int64</option>
+          </select>
+        </label>
+        <br />
+        <label>
+          Location:
+          <input
+            name='location'
+            type='text'
+            value={this.state.location}
+            onChange={this.handleChange.bind(this)}
+          />
+        </label>
+        <br />
+        <ToolbarButtonComponent
+            icon={addIcon}
+            onClick={this.addVertex.bind(this)}
+        />
+      </div>
+    )
+  }
+}
+
 
 /**
  * The namespace for graphscope graph schema operation component statics.
@@ -299,7 +394,7 @@ export namespace GSGraphOpComponents {
     translator?: ITranslator;
   };
 
-  export interface IState { };
+  export interface IState {};
 }
 
 
@@ -312,47 +407,153 @@ class GSGraphOpComponent extends React.Component<
     super(props);
   }
 
-  render () {
+  render() {
     const trans = this.props.translator.load('jupyterlab');
 
     return (
-        <UseSignal signal={this.props.signal}>
-          {() => {
-            return (
-              <>
-                <div className='jp-gsGraphOp-content'>
-                  <div className='jp-gsGraphOp-header'>
-                    <span className='jp-gsGraphOp-headerText'>
-                      Vertex List
-                    </span>
+      <UseSignal signal={this.props.signal}>
+        {() => {
+          return (
+            <>
+              <div className='jp-gsGraphOp-content'>
 
-                    <ToolbarButtonComponent
-                      icon={addIcon}
-                      onClick={() => { console.log('click event: create a new session.'); }}
-                      tooltip={trans.__('create vertex')}
-                    />
-                  </div>
+                {/* vertex list */}
+                <div className='jp-gsGraphOp-section-header'>
+                  <span className='jp-gsGraphOp-section-headerText'>
+                    Vertex List
+                  </span>
+
+                  <ToolbarButtonComponent
+                    icon={addIcon}
+                    onClick={() => { console.log('click event: create a new session.'); }}
+                    tooltip={trans.__('create vertex')}
+                  />
                 </div>
+                <div className='jp-gsGraphOp-section-content'>
+                  <GSVertexBuilderComponent
+                  />
 
-                <div className='jp-gsGraphOp-content'>
-                  <div className='jp-gsGraphOp-header'>
-                    <span className='jp-gsGraphOp-headerText'>
-                      Edge List
-                    </span>
-
-                    <ToolbarButtonComponent
-                      icon={addIcon}
-                      // label='Create'
-                      // iconLabel='Create'
-                      onClick={() => { console.log('click event: create a new session.'); }}
-                      tooltip={trans.__('create edge')}
-                    />
-                  </div>
+                  <table className='jp-gsGraphOp-section-table'>
+                    <tr>
+                      <th>Label</th>
+                      <th>Operations</th>
+                    </tr>
+                    <tr>
+                      <td>person</td>
+                      <td>
+                        <ToolbarButtonComponent
+                          icon={editIcon}
+                          onClick={() => { console.log(''); }}
+                          tooltip={trans.__('edit')}
+                        />
+                        <ToolbarButtonComponent
+                          icon={closeIcon}
+                          onClick={() => { console.log(''); }}
+                          tooltip={trans.__('delete')}
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>software</td>
+                      <td>
+                        <ToolbarButtonComponent
+                          icon={editIcon}
+                          onClick={() => { console.log(''); }}
+                          tooltip={trans.__('edit')}
+                        />
+                        <ToolbarButtonComponent
+                          icon={closeIcon}
+                          onClick={() => { console.log(''); }}
+                          tooltip={trans.__('delete')}
+                        />
+                      </td>
+                    </tr>
+                  </table>
                 </div>
-              </>
-            )
-          }}
-        </UseSignal>
+                {/* vertex list end */}
+
+                {/* edge list */}
+                <div className='jp-gsGraphOp-section-header'>
+                  <span className='jp-gsGraphOp-section-headerText'>
+                    Edge List
+                  </span>
+
+                  <ToolbarButtonComponent
+                    icon={addIcon}
+                    onClick={() => { console.log('click event: create a new session.'); }}
+                    tooltip={trans.__('create edge')}
+                  />
+                </div>
+                <div className='jp-gsGraphOp-section-content'>
+                  <table className='jp-gsGraphOp-section-table'>
+                    <tr>
+                      <th>Label</th>
+                      <th>Src Label</th>
+                      <th>Dst Label</th>
+                      <th>Operations</th>
+                    </tr>
+                    <tr>
+                      <td>knows</td>
+                      <td>person</td>
+                      <td>person</td>
+                      <td>
+                        <ToolbarButtonComponent
+                          icon={editIcon}
+                          onClick={() => { console.log(''); }}
+                          tooltip={trans.__('edit')}
+                        />
+                        <ToolbarButtonComponent
+                          icon={closeIcon}
+                          onClick={() => { console.log(''); }}
+                          tooltip={trans.__('delete')}
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>create</td>
+                      <td>person</td>
+                      <td>software</td>
+                      <td>
+                        <ToolbarButtonComponent
+                          icon={editIcon}
+                          onClick={() => { console.log(''); }}
+                          tooltip={trans.__('edit')}
+                        />
+                        <ToolbarButtonComponent
+                          icon={closeIcon}
+                          onClick={() => { console.log(''); }}
+                          tooltip={trans.__('delete')}
+                        />
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+                {/* edge list end */}
+
+                {/* code view */}
+                <div className='jp-gsGraphOp-section-header'>
+                  <span className='jp-gsGraphOp-section-headerText'>
+                    Code View
+                  </span>
+                </div>
+                <div className='jp-gsGraphOp-section-content'>
+                  <div className='jp-gsGraphOp-codeview'>
+                    <pre id='codeview'>
+                      def function():
+                      pass
+                    </pre>
+                  </div>
+                  <ToolbarButtonComponent
+                    label={'Insert'}
+                    onClick={() => { console.log('click event: insert code'); }}
+                    tooltip={trans.__('insert code into notebook cell')}
+                  />
+                </div>
+              </div>
+            </>
+          )
+        }}
+      </UseSignal>
     )
   }
 }

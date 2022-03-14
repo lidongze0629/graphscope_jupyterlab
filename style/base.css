@@ -157,7 +157,6 @@
   background: var(--jp-layout-color3);
 }
 
-
 /*
   graph schema operation content
 */
@@ -173,23 +172,71 @@
   font-size: var(--jp-ui-font-size1);
 }
 
-.jp-gsGraphOp-content .jp-gsGraphOp-header {
+.jp-gsGraphOp-content .jp-gsGraphOp-section-header {
   flex: 0 0 auto;
   font-size: var(--jp-ui-font-size0);
   font-weight: 600;
   letter-spacing: 1px;
-  margin: 0;
+  margin: 40px 0;
   padding: 8px 12px;
   text-transform: uppercase;
 }
 
-.jp-gsGraphOp-content .jp-gsGraphOp-header .jp-gsGraphOp-headerText {
+.jp-gsGraphOp-content .jp-gsGraphOp-section-header .jp-gsGraphOp-section-headerText {
   flex: 1 0 auto;
   margin: 0 10px;
 }
 
-.jp-gsGraphOp-content .jp-gsGraphOp-header > .jp-ToolbarButtonComponent {
+.jp-gsGraphOp-content .jp-gsGraphOp-section-header > .jp-ToolbarButtonComponent {
   background-color:rgb(172, 177, 174);
   width: 60px;
   margin: 10px 50%;
+}
+
+.jp-gsGraphOp-content .jp-gsGraphOp-section-content {
+  flex: 1 0 auto;
+  margin: 0 4px;
+}
+
+.jp-gsGraphOp-section-content .jp-gsGraphOp-section-table {
+  border-collapse: collapse;
+  width: 80%;
+  margin: auto;
+}
+
+.jp-gsGraphOp-section-table > tr th {
+  padding: 8px;
+  text-align: center;
+  background-color: rgb(249, 253, 251);
+}
+
+.jp-gsGraphOp-section-table > tr td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #DDD;
+}
+
+.jp-gsGraphOp-section-table > tr:hover {
+  background-color: rgb(249, 253, 251);
+}
+
+.jp-gsGraphOp-section-table td .jp-ToolbarButtonComponent {
+  display: inline;
+}
+
+.jp-gsGraphOp-content .jp-gsGraphOp-section-content .jp-gsGraphOp-codeview {
+  width: 80%;
+  height: 150px;
+  margin: auto;
+  border: rgb(172, 177, 174);
+}
+
+.jp-gsGraphOp-section-content > .jp-ToolbarButtonComponent {
+  background-color:rgb(205, 209, 206);
+  width: 100px;
+  margin: 10px 50%;
+}
+
+.jp-gsGraphOp-section-content .jp-gsGraphOp-section-build-vertex {
+  display: block;
 }
