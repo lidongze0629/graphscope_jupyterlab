@@ -14,10 +14,6 @@ import { ISignal, Signal } from '@lumino/signaling';
 
 import { CommandIDs } from './common';
 
-import { Form, Input } from 'antd';
-
-// import { ConsoleSqlOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
-
 // import { INotebookTracker } from '@jupyterlab/notebook';
 
 // import { CodeCell, MarkdownCell } from '@jupyterlab/cells';
@@ -38,6 +34,10 @@ import { gsIcon } from './common';
 
 import { IVariableInspector, VariableInspector } from './variableinspector';
 
+import { GSVariable } from './gsvariable';
+
+import { GraphManager } from './graphmanager';
+
 import 'bootstrap/dist/css/bootstrap.css';
 
 
@@ -52,56 +52,6 @@ const caretRightIconStyled = caretRightIcon.bindprops({
   height: 'auto',
   width: '20px'
 });
-
-
-/**
- * Namespace of graphscope variable
- */
-export namespace GSVariable {
-  /**
-   * Graph variable interface of graphscope.
-   */
-  export interface GSAppOrGraphVariable {
-    /**
-     * Variable name of the application/graph.
-     */
-    name: string;
-    /**
-     * Type: graph or application
-     */
-    type: string;
-    /**
-     * State, loaded or unloaded.
-     */
-    state: string;
-    /**
-     * output of `__str__` in python class.
-     */
-    content: string;
-  }
-
-  /**
-   * Session variable interface of graphscope.
-   */
-  export interface GSSessionVariable {
-    /**
-     * Variable name of the session.
-     */
-    name: string;
-    /**
-     * State, active、disconnected or closed.
-     */
-    state: string;
-    /**
-     * output of `__str__` in python class.
-     */
-    content: string;
-    /**
-     * Resource exists in this session.
-     */
-    items: GSAppOrGraphVariable[];
-  }
-}
 
 
 /**
@@ -281,12 +231,7 @@ namespace GSGraphBuilderComponents {
     translator?: ITranslator;
   }
 
-  export interface IState {
-    label: string;
-    location: string;
-    oid_type: string;
-    property_num: number;
-  }
+  export interface IState { }
 
   /*
   export interface IVertexState {
@@ -301,43 +246,55 @@ class GSGraphOpGraphBuilderComponent extends React.Component<
   GSGraphBuilderComponents.IProperties, GSGraphBuilderComponents.IState> {
   constructor(props: GSGraphBuilderComponents.IProperties) {
     super(props);
+  }
 
-    this.state = {
-      label: "",
-      oid_type: "",
-      location: "",
-      property_num: 2,
+  createVertex(): void {
+    const vertex: GSVariable.Vertex = {
+      label: 'comment',
+      location: '/Users/lidongze/alibaba/gstest/ldbc_sample/comment_0_0.csv',
+      header_row: true,
+      delimiter: '|',
+      properties: [
+        ["creationDate", "null"], ["locationIP", "null"], ["browserUsed", 'null'], ["content", 'null'], ["length", 'null']
+      ],
+      vid_field: 'id'
+    };
+
+    this.props.component.createVertex(vertex);
+  }
+
+  createEdge(): void {
+    const edge: GSVariable.Edge = {
+      label: 'replyOf',
+      location: '/Users/lidongze/alibaba/gstest/ldbc_sample/comment_replyOf_comment_0_0.csv',
+      header_row: true,
+      delimiter: '|',
+      properties: [],
+      src_field: 'Comment.id',
+      src_label: 'comment',
+      dst_field: 'Comment.id.1',
+      dst_label: 'comment',
     }
+
+    this.props.component.createEdge(edge);
   }
 
-  onFinish(values: any): void {
-    console.log("onFinish: ", values);
-  }
-
-  onFinishFailed(errorInfo: any): void {
-    console.log('onFinishFailed: ', errorInfo);
-  }
 
   render(): React.ReactNode {
     return (
       <>
-        <Form
-          name="vertex builder"
-          onFinish={this.onFinish.bind(this)}
-          onFinishFailed={this.onFinishFailed.bind(this)}
-          autoComplete='off'
-        >
-          { /*  label */ }
-          <Form.Item
-            label='Label'
-
-            name="label"
-            rules={[{ required: true, message: 'vertex label' }]}
-          >
-            <Input />
-          </Form.Item>
-
-        </Form>
+        <div className='jp-gsGraphOp-content'>
+          <ToolbarButtonComponent
+            label={'Create Vertex'}
+            onClick={this.createVertex.bind(this)}
+          />
+        </div>
+        <div className='jp-gsGraphOp-content'>
+          <ToolbarButtonComponent
+            label={'Create Edge'}
+            onClick={this.createEdge.bind(this)}
+          />
+        </div>
       </>
     )
   }
@@ -351,6 +308,10 @@ export namespace GSGraphOpDisplayComponents {
      */
     component: GSGraphOpComponent;
     /**
+     * The graphscope graph operation widget.
+     */
+    widget: GSGraphOpWidget;
+    /**
      *  Jupyterlab translator.
      */
     translator?: ITranslator;
@@ -363,6 +324,88 @@ class GSGraphOpDisplayComponent extends React.Component<
   GSGraphOpDisplayComponents.IProperties, GSGraphOpDisplayComponents.IState> {
   constructor(props: GSGraphOpDisplayComponents.IProperties) {
     super(props);
+  }
+
+  _render_vertex_table() {
+    const trans = this.props.translator.load('jupyterlab');
+
+    const elements: React.ReactElement<any>[] = [];
+    const contents: any[] = [];
+
+    for (let vlabel of this.props.widget.graphManager.vertices.keys()) {
+      contents.push(
+        <tr>
+          <td>{vlabel}</td>
+          <td>
+            <ToolbarButtonComponent
+              icon={editIcon}
+              onClick={() => { console.log(''); }}
+              tooltip={trans.__('edit')}
+            />
+            <ToolbarButtonComponent
+              icon={closeIcon}
+              onClick={() => { console.log(''); }}
+              tooltip={trans.__('delete')}
+            />
+          </td>
+        </tr>
+      )
+    }
+
+    elements.push(
+      <table className='jp-gsGraphOp-section-table'>
+        <tr>
+          <th>Label</th>
+          <th>Operations</th>
+        </tr>
+        {contents}
+      </table>
+    )
+
+    return elements;
+  }
+
+  _render_edge_table() {
+    const trans = this.props.translator.load('jupyterlab');
+
+    const elements: React.ReactElement<any>[] = [];
+    const contents: any[] = [];
+
+    for (let [elabel, e] of this.props.widget.graphManager.edges) {
+      contents.push(
+        <tr>
+          <td>{elabel}</td>
+          <td>{e.src_label}</td>
+          <td>{e.dst_label}</td>
+          <td>
+            <ToolbarButtonComponent
+              icon={editIcon}
+              onClick={() => { console.log(''); }}
+              tooltip={trans.__('edit')}
+            />
+            <ToolbarButtonComponent
+              icon={closeIcon}
+              onClick={() => { console.log(''); }}
+              tooltip={trans.__('delete')}
+            />
+          </td>
+        </tr>
+      )
+    }
+
+    elements.push(
+      <table className='jp-gsGraphOp-section-table'>
+        <tr>
+          <th>Label</th>
+          <th>Src Label</th>
+          <th>Dst Label</th>
+          <th>Operations</th>
+        </tr>
+        {contents}
+      </table>
+    )
+
+    return elements;
   }
 
   render(): React.ReactNode {
@@ -387,27 +430,7 @@ class GSGraphOpDisplayComponent extends React.Component<
             />
           </div>
           <div className='jp-gsGraphOp-section-content'>
-            <table className='jp-gsGraphOp-section-table'>
-              <tr>
-                <th>Label</th>
-                <th>Operations</th>
-              </tr>
-              <tr>
-                <td>person</td>
-                <td>
-                  <ToolbarButtonComponent
-                    icon={editIcon}
-                    onClick={() => { console.log(''); }}
-                    tooltip={trans.__('edit')}
-                  />
-                  <ToolbarButtonComponent
-                    icon={closeIcon}
-                    onClick={() => { console.log(''); }}
-                    tooltip={trans.__('delete')}
-                  />
-                </td>
-              </tr>
-            </table>
+            {this._render_vertex_table()}
           </div>
           {/* vertex list end */}
 
@@ -424,31 +447,7 @@ class GSGraphOpDisplayComponent extends React.Component<
             />
           </div>
           <div className='jp-gsGraphOp-section-content'>
-            <table className='jp-gsGraphOp-section-table'>
-              <tr>
-                <th>Label</th>
-                <th>Src Label</th>
-                <th>Dst Label</th>
-                <th>Operations</th>
-              </tr>
-              <tr>
-                <td>knows</td>
-                <td>person</td>
-                <td>person</td>
-                <td>
-                  <ToolbarButtonComponent
-                    icon={editIcon}
-                    onClick={() => { console.log(''); }}
-                    tooltip={trans.__('edit')}
-                  />
-                  <ToolbarButtonComponent
-                    icon={closeIcon}
-                    onClick={() => { console.log(''); }}
-                    tooltip={trans.__('delete')}
-                  />
-                </td>
-              </tr>
-            </table>
+            {this._render_edge_table()}
           </div>
           {/* edge list end */}
 
@@ -524,7 +523,7 @@ export namespace GSGraphOpComponents {
 
 
 /**
- * React component of graph operation widget.
+ * Base react component of graph operation widget.
  */
 class GSGraphOpComponent extends React.Component<
   GSGraphOpComponents.IProperties, GSGraphOpComponents.IState> {
@@ -536,6 +535,24 @@ class GSGraphOpComponent extends React.Component<
     }
   }
 
+  createVertex(vertex: GSVariable.Vertex): void {
+    try {
+      this.props.widget.graphManager.addVertex(vertex);
+    } catch (ex) {
+      console.log('catch exception in createVertex: ', ex);
+    }
+    this.setState({ currentWidget: GSGraphOpComponents.OptionalWidgets.displayWidget });
+  }
+
+  createEdge(edge: GSVariable.Edge): void {
+    try {
+      this.props.widget.graphManager.addEdge(edge);
+    } catch (ex) {
+      console.log('catch exception in createEdge: ', ex);
+    }
+    this.setState({ currentWidget: GSGraphOpComponents.OptionalWidgets.displayWidget });
+  }
+
   render() {
     return (
       <UseSignal signal={this.props.signal}>
@@ -544,6 +561,7 @@ class GSGraphOpComponent extends React.Component<
             return <GSGraphOpDisplayComponent
               translator={this.props.translator}
               component={this}
+              widget={this.props.widget}
             />
           } else if (
             this.state.currentWidget === GSGraphOpComponents.OptionalWidgets.addVertexWidget ||
@@ -574,6 +592,9 @@ export class GSGraphOpWidget extends ReactWidget {
     this.translator = translator || nullTranslator;
     this._meta = meta;
 
+    // todo, restore after refresh browser
+    this._graphManager = new GraphManager({});
+
     const trans = this.translator.load('jupyterlab');
     this.id = trans.__('gs-graphop-widget');
     this.title.label = trans.__('Graph Schema ' + '(' + this._meta['sess'] + ')');
@@ -587,6 +608,10 @@ export class GSGraphOpWidget extends ReactWidget {
 
   get runnningChanged(): ISignal<GSGraphOpWidget, void> {
     return this._runningChanged;
+  }
+
+  get graphManager(): GraphManager {
+    return this._graphManager;
   }
 
   render() {
@@ -608,6 +633,8 @@ export class GSGraphOpWidget extends ReactWidget {
   // }
   private _meta: { [name: string]: any } = {};
   private _runningChanged = new Signal<this, void>(this);
+
+  private _graphManager: GraphManager;
 }
 
 
@@ -657,8 +684,8 @@ export abstract class IVariableInspectorWidget
  */
 export namespace GSSidebarComponents {
   /**
-        * React properties for graphscope sidebar component.
-        */
+   * React properties for graphscope sidebar component.
+  */
   export interface IProperties {
     /**
      * Command Registry.
