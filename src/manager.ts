@@ -1,6 +1,6 @@
 import { Token } from '@lumino/coreutils';
 
-// import { INotebookTracker } from '@jupyterlab/notebook';
+import { INotebookTracker } from '@jupyterlab/notebook';
 
 import { IVariableInspectorWidget } from './widget';
 
@@ -13,6 +13,7 @@ export const IGSVariableManager = new Token<IGSVariableManager>(
 );
 
 export interface IGSVariableManager {
+  notebook: INotebookTracker | null;
   handler: VariableInspector.IInspectable | null;
   hasHandler(id: string): boolean;
   addHandler(handler: VariableInspector.IInspectable): void;
@@ -20,10 +21,6 @@ export interface IGSVariableManager {
 }
 
 export class GSVariableManager implements IGSVariableManager {
-  // get notebook(): INotebookTracker | null {
-  //     return this._notebook;
-  // }
-
   // set notebook(nb: INotebookTracker | null) {
   //     this._notebook = nb;
   // set 'panel.notebook' tracker whether it's disposed or not
@@ -44,6 +41,14 @@ export class GSVariableManager implements IGSVariableManager {
 
   public addHandler(handler: VariableInspectionHandler): void {
     this._handlers[handler.id] = handler;
+  }
+
+  get notebook(): INotebookTracker | null {
+    return this._notebook;
+  }
+
+  set notebook(nb: INotebookTracker | null) {
+    this._notebook = nb;
   }
 
   get handler(): VariableInspector.IInspectable {
@@ -79,16 +84,21 @@ export class GSVariableManager implements IGSVariableManager {
 
   public registePanel(panel: IVariableInspectorWidget): void {
     this._panels.set(panel.id, panel);
+    // notebook tracker
+    if (this._notebook !== null) {
+      this._panels.get(panel.id).notebook = this._notebook;
+    }
+    // disposed
+    this._panels.get(panel.id).disposed.connect(() => {
+      this._panels.delete(panel.id);
+    })
   }
 
   private _onHandlerDisposed(): void {
     this._handler = null;
   }
 
-  // TODO (dongze): double check whether wrapper _notebook or not.
-  // private _notebook: INotebookTracker | null;
-
-  // private _panel: GSWidget = null;
+  private _notebook: INotebookTracker | null;
 
   // each panel will hold current source handler which can interactive with kernel
   private _panels = new Map<string, IVariableInspectorWidget>();

@@ -14,9 +14,9 @@ import { ISignal, Signal } from '@lumino/signaling';
 
 import { CommandIDs } from './common';
 
-// import { INotebookTracker } from '@jupyterlab/notebook';
+import { INotebookTracker } from '@jupyterlab/notebook';
 
-// import { CodeCell, MarkdownCell } from '@jupyterlab/cells';
+import { CodeCell, MarkdownCell } from '@jupyterlab/cells';
 
 import {
   caretDownIcon,
@@ -39,6 +39,56 @@ import { GSVariable } from './gsvariable';
 import { GraphManager } from './graphmanager';
 
 import 'bootstrap/dist/css/bootstrap.css';
+
+
+/**
+ * Abstract class for variable inspector.
+ *
+ * Any widget inherits this class could interactive with the kernel.
+ */
+export abstract class IVariableInspectorWidget
+  extends ReactWidget
+  implements IVariableInspector {
+  set handler(handler: VariableInspector.IInspectable | null) {
+    if (this._handler == handler) {
+      return;
+    }
+    // remove old subscriptions
+    if (this._handler) {
+      this._handler.inspected.disconnect(this.onInspectorUpdate, this);
+      this._handler.disposed.disconnect(this.onHandlerDisposed, this);
+    }
+    this._handler = handler;
+    // subscriptions
+    if (this._handler) {
+      this._handler.inspected.connect(this.onInspectorUpdate, this);
+      this._handler.disposed.connect(this.onHandlerDisposed, this);
+      this._handler.performInspection();
+    }
+  }
+
+  get handler(): VariableInspector.IInspectable | null {
+    return this._handler;
+  }
+
+  get notebook(): INotebookTracker | null {
+    return this._notebook;
+  }
+
+  set notebook(nb: INotebookTracker | null) {
+    this._notebook = nb;
+  }
+
+  protected abstract onInspectorUpdate(
+    sender: any,
+    args: VariableInspector.IVariableInspectorUpdate
+  ): void;
+
+  protected abstract onHandlerDisposed(sender: any, args: void): void;
+
+  private _notebook: INotebookTracker | null = null;
+  private _handler: VariableInspector.IInspectable | null = null;
+}
 
 
 /**
@@ -189,42 +239,6 @@ export class CollapsibleSection extends React.Component<
 }
 
 
-/**
- * Main area react component
- *
- * @return The react component
- */
-/*
-function GSMainAreaComponent(props: {
-  widget: GSWidget;
-  signal: ISignal<GSWidget, void>;
-}) {
-  return (
-    <>
-      <div>
-        <UseSignal signal={props.signal}>
-          {() => {
-            return <ListView payload={props.widget.payload} />;
-          }}
-        </UseSignal>
-        <input type="text" id="example"></input>
-        <button
-          onClick={(): void => {
-            let a = (document.getElementById('example') as HTMLInputElement)
-              .value;
-            props.widget.tempMethodForInsertCodeIntoNotebookCell(a);
-          }}
-        >
-          Insert code into cell
-        </button>
-      </div>
-    </>
-  );
-}
-*/
-
-
-
 namespace GSGraphBuilderComponents {
   export interface IProperties {
     component: GSGraphOpComponent;
@@ -326,6 +340,28 @@ class GSGraphOpDisplayComponent extends React.Component<
     super(props);
   }
 
+  insertCode(): void {
+    const trans = this.props.translator.load('jupyterlab');
+
+    const widget = this.props.widget;
+    const code = widget.graphManager.generateCode(widget.meta["sess"]);
+
+    const cell = widget.notebook.activeCell;
+    if (cell === null) {
+      showDialog({
+        title: trans.__('WRANNING'),
+        body: trans.__('No focused cell found.'),
+        buttons: [Dialog.okButton()]
+      }).catch(e => console.log(e));
+    }
+
+    if (cell instanceof MarkdownCell) {
+      cell.editor.replaceSelection('```' + '\n' + code + '\n```');
+    } else if (cell instanceof CodeCell) {
+      cell.editor.replaceSelection(code);
+    }
+  }
+
   _render_vertex_table() {
     const trans = this.props.translator.load('jupyterlab');
 
@@ -371,26 +407,28 @@ class GSGraphOpDisplayComponent extends React.Component<
     const elements: React.ReactElement<any>[] = [];
     const contents: any[] = [];
 
-    for (let [elabel, e] of this.props.widget.graphManager.edges) {
-      contents.push(
-        <tr>
-          <td>{elabel}</td>
-          <td>{e.src_label}</td>
-          <td>{e.dst_label}</td>
-          <td>
-            <ToolbarButtonComponent
-              icon={editIcon}
-              onClick={() => { console.log(''); }}
-              tooltip={trans.__('edit')}
-            />
-            <ToolbarButtonComponent
-              icon={closeIcon}
-              onClick={() => { console.log(''); }}
-              tooltip={trans.__('delete')}
-            />
-          </td>
-        </tr>
-      )
+    for (let [elabel, edges] of this.props.widget.graphManager.edges) {
+      for (let e of edges) {
+        contents.push(
+          <tr>
+            <td>{elabel}</td>
+            <td>{e.src_label}</td>
+            <td>{e.dst_label}</td>
+            <td>
+              <ToolbarButtonComponent
+                icon={editIcon}
+                onClick={() => { console.log(''); }}
+                tooltip={trans.__('edit')}
+              />
+              <ToolbarButtonComponent
+                icon={closeIcon}
+                onClick={() => { console.log(''); }}
+                tooltip={trans.__('delete')}
+              />
+            </td>
+          </tr>
+        )
+      }
     }
 
     elements.push(
@@ -466,7 +504,7 @@ class GSGraphOpDisplayComponent extends React.Component<
             </div>
             <ToolbarButtonComponent
               label={'Insert'}
-              onClick={() => { console.log('click event: insert code'); }}
+              onClick={this.insertCode.bind(this)}
               tooltip={trans.__('insert code into notebook cell')}
             />
           </div>
@@ -582,7 +620,7 @@ class GSGraphOpComponent extends React.Component<
 /**
  * The widget for operate graph.
  */
-export class GSGraphOpWidget extends ReactWidget {
+export class GSGraphOpWidget extends IVariableInspectorWidget {
   /**
    * Constructs a new GSGraphOpWidget.
    */
@@ -596,7 +634,7 @@ export class GSGraphOpWidget extends ReactWidget {
     this._graphManager = new GraphManager({});
 
     const trans = this.translator.load('jupyterlab');
-    this.id = trans.__('gs-graphop-widget');
+    this.id = trans.__('gs-graphop-widget' + '(' + this._meta['sess'] + ')');
     this.title.label = trans.__('Graph Schema ' + '(' + this._meta['sess'] + ')');
     this.title.icon = gsIcon;
     this.title.closable = true;
@@ -612,6 +650,23 @@ export class GSGraphOpWidget extends ReactWidget {
 
   get graphManager(): GraphManager {
     return this._graphManager;
+  }
+
+  /**
+   * Handle variable update signals.
+   */
+  protected onInspectorUpdate(
+    sender: any,
+    args: VariableInspector.IVariableInspectorUpdate
+  ): void {
+    // no-op
+  }
+
+  /**
+   * Handle hander disposed signals.
+   */
+  protected onHandlerDisposed(sender: any, args: void): void {
+    // no-op
   }
 
   render() {
@@ -635,47 +690,6 @@ export class GSGraphOpWidget extends ReactWidget {
   private _runningChanged = new Signal<this, void>(this);
 
   private _graphManager: GraphManager;
-}
-
-
-/**
- * Abstract class for variable inspector.
- *
- * Any widget inherits this class could interactive with the kernel.
- */
-export abstract class IVariableInspectorWidget
-  extends ReactWidget
-  implements IVariableInspector {
-  set handler(handler: VariableInspector.IInspectable | null) {
-    if (this._handler == handler) {
-      return;
-    }
-    // remove old subscriptions
-    if (this._handler) {
-      this._handler.inspected.disconnect(this.onInspectorUpdate, this);
-      this._handler.disposed.disconnect(this.onHandlerDisposed, this);
-    }
-    this._handler = handler;
-    // subscriptions
-    if (this._handler) {
-      this._handler.inspected.connect(this.onInspectorUpdate, this);
-      this._handler.disposed.connect(this.onHandlerDisposed, this);
-      this._handler.performInspection();
-    }
-  }
-
-  get handler(): VariableInspector.IInspectable | null {
-    return this._handler;
-  }
-
-  protected abstract onInspectorUpdate(
-    sender: any,
-    args: VariableInspector.IVariableInspectorUpdate
-  ): void;
-
-  protected abstract onHandlerDisposed(sender: any, args: void): void;
-
-  private _handler: VariableInspector.IInspectable | null = null;
 }
 
 

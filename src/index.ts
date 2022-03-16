@@ -88,6 +88,8 @@ const variableinspector: JupyterFrontEndPlugin<IGSVariableManager> = {
                   translator
                 )
               });
+              // register to manager
+              manager.registePanel(gsGraphOpWidget.content);
               // track the panel
               tracker.add(gsGraphOpWidget);
             }
@@ -218,16 +220,10 @@ const notebooks: JupyterFrontEndPlugin<void> = {
           manager.handler = new_handler;
           manager.handler.performInspection();
           // set notebook tracker
-          // manager.notebook = notebooks;
+          manager.notebook = notebooks;
         }
       });
     });
-
-    // add to notebook context menu
-    // app.contextMenu.addItem({
-    // command: CommandIDs.open,
-    // selector: '.jp-Notebook',
-    // });
   }
 };
 
