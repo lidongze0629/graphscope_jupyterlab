@@ -496,12 +496,6 @@ class GSGraphOpDisplayComponent extends React.Component<
             </span>
           </div>
           <div className='jp-gsGraphOp-section-content'>
-            <div className='jp-gsGraphOp-codeview'>
-              <pre id='codeview'>
-                def function():
-                pass
-              </pre>
-            </div>
             <ToolbarButtonComponent
               label={'Insert'}
               onClick={this.insertCode.bind(this)}
