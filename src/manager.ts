@@ -56,7 +56,7 @@ export class GSVariableManager implements IGSVariableManager {
   }
 
   set handler(handler: VariableInspector.IInspectable) {
-    if (this._handler == handler) {
+    if (this._handler === handler) {
       return;
     }
     // remove subscriptions
@@ -68,7 +68,7 @@ export class GSVariableManager implements IGSVariableManager {
     this._handler = handler;
 
     // set handler to each registered panel
-    for (let panel of this._panels.values()) {
+    for (const panel of this._panels.values()) {
       panel.handler = this._handler;
     }
 
@@ -91,7 +91,7 @@ export class GSVariableManager implements IGSVariableManager {
     // disposed
     this._panels.get(panel.id).disposed.connect(() => {
       this._panels.delete(panel.id);
-    })
+    });
   }
 
   private _onHandlerDisposed(): void {

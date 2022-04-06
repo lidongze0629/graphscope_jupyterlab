@@ -16,16 +16,12 @@ import { CommandIDs } from './common';
 
 import { INotebookTracker } from '@jupyterlab/notebook';
 
-// import { CodeCell, MarkdownCell } from '@jupyterlab/cells';
-
 import {
   caretDownIcon,
   caretRightIcon,
   searchIcon,
   addIcon,
-  // editIcon,
-  // closeIcon,
-  Collapse,
+  Collapse
 } from '@jupyterlab/ui-components';
 
 import React from 'react';
@@ -42,7 +38,6 @@ import { GraphOpComponent } from './graph';
 
 import 'bootstrap/dist/css/bootstrap.css';
 
-
 /**
  * Abstract class for variable inspector.
  *
@@ -50,9 +45,10 @@ import 'bootstrap/dist/css/bootstrap.css';
  */
 export abstract class IVariableInspectorWidget
   extends ReactWidget
-  implements IVariableInspector {
+  implements IVariableInspector
+{
   set handler(handler: VariableInspector.IInspectable | null) {
-    if (this._handler == handler) {
+    if (this._handler === handler) {
       return;
     }
     // remove old subscriptions
@@ -92,7 +88,6 @@ export abstract class IVariableInspectorWidget
   private _handler: VariableInspector.IInspectable | null = null;
 }
 
-
 /**
  * Icons with custom styling bound.
  */
@@ -104,7 +99,6 @@ const caretRightIconStyled = caretRightIcon.bindprops({
   height: 'auto',
   width: '20px'
 });
-
 
 /**
  * The namespace for collapsible section statics.
@@ -161,7 +155,6 @@ export namespace CollapsibleSection {
     isOpen: boolean;
   }
 }
-
 
 export class CollapsibleSection extends React.Component<
   CollapsibleSection.IProperties,
@@ -240,7 +233,6 @@ export class CollapsibleSection extends React.Component<
   }
 }
 
-
 /**
  * The widget for operate graph.
  */
@@ -248,7 +240,11 @@ export class GraphOpWidget extends IVariableInspectorWidget {
   /**
    * Constructs a new GraphOpWidget.
    */
-  constructor(meta: { [name: string]: any }, commands: CommandRegistry, translator?: ITranslator) {
+  constructor(
+    meta: { [name: string]: any },
+    commands: CommandRegistry,
+    translator?: ITranslator
+  ) {
     super();
     this.commands = commands;
     this.translator = translator || nullTranslator;
@@ -259,7 +255,9 @@ export class GraphOpWidget extends IVariableInspectorWidget {
 
     const trans = this.translator.load('jupyterlab');
     this.id = trans.__('gs-graphop-widget' + '(' + this._meta['sess'] + ')');
-    this.title.label = trans.__('Graph Schema ' + '(' + this._meta['sess'] + ')');
+    this.title.label = trans.__(
+      'Graph Schema ' + '(' + this._meta['sess'] + ')'
+    );
     this.title.icon = gsIcon;
     this.title.closable = true;
   }
@@ -301,7 +299,7 @@ export class GraphOpWidget extends IVariableInspectorWidget {
         widget={this}
         signal={this._runningChanged}
       />
-    )
+    );
   }
 
   public translator: ITranslator;
@@ -316,19 +314,18 @@ export class GraphOpWidget extends IVariableInspectorWidget {
   private _graphManager: GraphManager;
 }
 
-
 /**
  * The namespace for graphscope sidebar component statics.
  */
 export namespace GSSidebarComponents {
   /**
    * React properties for graphscope sidebar component.
-  */
+   */
   export interface IProperties {
     /**
      * Command Registry.
      */
-    commands: CommandRegistry
+    commands: CommandRegistry;
 
     /**
      * The graphscope sidebar widget.
@@ -344,13 +341,15 @@ export namespace GSSidebarComponents {
      *  Jupyterlab translator.
      */
     translator?: ITranslator;
-  };
+  }
 
-  export interface IState { };
+  export interface IState {}
 }
 
-
-function SectionItem(props: { translator: ITranslator, item: GSVariable.GSAppOrGraphVariable }) {
+function SectionItem(props: {
+  translator: ITranslator;
+  item: GSVariable.IAppOrGraphVariable;
+}) {
   const trans = props.translator.load('jupyterlab');
 
   let className = 'jp-gsSidebar-sectionItemLabel';
@@ -361,11 +360,13 @@ function SectionItem(props: { translator: ITranslator, item: GSVariable.GSAppOrG
   }
 
   return (
-    <li className='jp-gsSidebar-sectionItem'>
+    <li className="jp-gsSidebar-sectionItem">
       <span
         className={className}
-        title={"graphscope " + props.item.type}
-        onClick={() => { console.log('click event: click on ', props.item.name) }}
+        title={'graphscope ' + props.item.type}
+        onClick={() => {
+          console.log('click event: click on ', props.item.name);
+        }}
       >
         {props.item.name}
       </span>
@@ -382,33 +383,31 @@ function SectionItem(props: { translator: ITranslator, item: GSVariable.GSAppOrG
         tooltip="detail"
       />
     </li>
-  )
+  );
 }
 
-
-function SectionListView(props: { translator: ITranslator, items: GSVariable.GSAppOrGraphVariable[] }) {
+function SectionListView(props: {
+  translator: ITranslator;
+  items: GSVariable.IAppOrGraphVariable[];
+}) {
   return (
-    <div className='jp-gsSidebar-section-content'>
-      <ul className='jp-gsSidebar-sectionList'>
+    <div className="jp-gsSidebar-section-content">
+      <ul className="jp-gsSidebar-sectionList">
         {props.items.map((item, i) => {
-          return (
-            <SectionItem
-              translator={props.translator}
-              item={item}
-            />
-          );
+          return <SectionItem translator={props.translator} item={item} />;
         })}
       </ul>
     </div>
-  )
+  );
 }
-
 
 /**
  * React component of sidebar.
  */
 class SidebarComponent extends React.Component<
-  GSSidebarComponents.IProperties, GSSidebarComponents.IState> {
+  GSSidebarComponents.IProperties,
+  GSSidebarComponents.IState
+> {
   constructor(props: GSSidebarComponents.IProperties) {
     super(props);
   }
@@ -418,13 +417,13 @@ class SidebarComponent extends React.Component<
 
     return (
       <>
-        <div className='jp-gsSidebar-header'>
-          <span className='jp-gsSidebar-headerText'>
-            List of Resources
-          </span>
+        <div className="jp-gsSidebar-header">
+          <span className="jp-gsSidebar-headerText">List of Resources</span>
           <ToolbarButtonComponent
             icon={addIcon}
-            onClick={() => { console.log('click event: create a new session.'); }}
+            onClick={() => {
+              console.log('click event: create a new session.');
+            }}
             tooltip={trans.__('Create a new session')}
           />
         </div>
@@ -435,7 +434,7 @@ class SidebarComponent extends React.Component<
             const contents: any[] = [];
 
             this.props.widget.payload.map((sess, i) => {
-              let disabled: boolean = false;
+              let disabled = false;
               if (sess.state === 'closed' || sess.state === 'disconnected') {
                 disabled = true;
               }
@@ -450,8 +449,12 @@ class SidebarComponent extends React.Component<
                   headerElements={
                     <ToolbarButtonComponent
                       icon={addIcon}
-                      onClick={() => { this.props.commands.execute(CommandIDs.open, { sess: sess.name }); }}
-                      tooltip='Create a new graph'
+                      onClick={() => {
+                        this.props.commands.execute(CommandIDs.open, {
+                          sess: sess.name
+                        });
+                      }}
+                      tooltip="Create a new graph"
                     />
                   }
                 >
@@ -460,23 +463,20 @@ class SidebarComponent extends React.Component<
                     items={sess.items}
                   />
                 </CollapsibleSection>
-              )
-            })
+              );
+            });
 
             elements.push(
-              <div className='jp-gsSidebar-content'>
-                {contents}
-              </div>
-            )
+              <div className="jp-gsSidebar-content">{contents}</div>
+            );
 
             return elements;
           }}
         </UseSignal>
       </>
-    )
+    );
   }
 }
-
 
 /**
  * The widget for graphscope sidebar.
@@ -518,28 +518,38 @@ export class SidebarWidget extends IVariableInspectorWidget {
       return;
     }
 
-    let sessions = new Map<string, GSVariable.GSSessionVariable>();
+    const sessions = new Map<string, GSVariable.ISessionVariable>();
 
     // handle `session`
     args.payload.forEach(v => {
       if (v.type === 'session') {
-        sessions.set(v.props.session_id, { name: v.name, content: v.content, state: v.props.state, items: [] });
+        sessions.set(v.props.session_id, {
+          name: v.name,
+          content: v.content,
+          state: v.props.state,
+          items: []
+        });
       }
     });
 
     // handle `graph`
     args.payload.forEach(v => {
       if (v.type === 'graph') {
-        let session_id = v.props.session_id;
+        const session_id = v.props.session_id;
         if (sessions.has(session_id)) {
-          let session = sessions.get(session_id);
-          session.items.push({ name: v.name, content: v.content, type: "graph", state: v.props.state });
+          const session = sessions.get(session_id);
+          session.items.push({
+            name: v.name,
+            content: v.content,
+            type: 'graph',
+            state: v.props.state
+          });
         }
       }
     });
 
     this._payload = [];
-    for (let value of sessions.values()) {
+    for (const value of sessions.values()) {
       this._payload.push(value);
     }
 
@@ -557,7 +567,7 @@ export class SidebarWidget extends IVariableInspectorWidget {
     return this._runningChanged;
   }
 
-  get payload(): GSVariable.GSSessionVariable[] {
+  get payload(): GSVariable.ISessionVariable[] {
     return this._payload;
   }
 
@@ -575,6 +585,6 @@ export class SidebarWidget extends IVariableInspectorWidget {
   public translator: ITranslator;
   protected commands: CommandRegistry;
 
-  private _payload: GSVariable.GSSessionVariable[] = [];
+  private _payload: GSVariable.ISessionVariable[] = [];
   private _runningChanged = new Signal<this, void>(this);
 }
