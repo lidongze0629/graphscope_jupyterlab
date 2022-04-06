@@ -7,7 +7,7 @@ import SelectComponent from '../SelectComponent';
 import Tips from '../Tips';
 import ExtraParamsComponent from '../ExtraParamsComponent';
 
-import './index.less';
+// import './index.less';
 
 interface IRenderFormItemProps {
   formList: FormListObj[];

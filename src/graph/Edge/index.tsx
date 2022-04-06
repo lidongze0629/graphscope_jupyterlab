@@ -8,7 +8,7 @@ import RenderFormItem from '../Components/RenderFormItem';
 import { Status } from '../../graph';
 import { booleanOptions, dataSourceOptions, delimiterOptions } from '../constant';
 import PropertiesTable from '../Components/PropertiesTable';
-import './index.less';
+// import './index.less';
 
 interface IEdgeProps {
   initialValues?: EdgesObj;

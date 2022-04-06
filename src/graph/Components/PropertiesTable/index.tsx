@@ -4,7 +4,7 @@ import { DeleteOutlined, CheckOutlined } from '@ant-design/icons';
 import { EditableProTable } from '@ant-design/pro-table';
 
 import { TableDataObj } from '../../interface';
-import './index.less';
+// import './index.less';
 import { handleBooleanData, buildProTableData } from './helper';
 
 interface IPropertiesTableProps {
