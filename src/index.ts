@@ -33,7 +33,7 @@ import { GSVariableManager, IGSVariableManager } from './manager';
 
 import { Languages } from './scripts';
 
-import { GSSidebarWidget, GSGraphOpWidget } from './widget';
+import { SidebarWidget, GraphOpWidget } from './widget';
 
 /**
  * A service providing variable inspection.
@@ -60,11 +60,11 @@ const variableinspector: JupyterFrontEndPlugin<IGSVariableManager> = {
     contextMenuManager.init();
 
     // track and restore the widget state
-    const tracker = new WidgetTracker<MainAreaWidget<GSGraphOpWidget>>({
+    const tracker = new WidgetTracker<MainAreaWidget<GraphOpWidget>>({
       namespace: NAMESPACE
     });
     // register to command system
-    let gsGraphOpWidget: MainAreaWidget<GSGraphOpWidget>;
+    let graphOpWidget: MainAreaWidget<GraphOpWidget>;
     const command = CommandIDs.open;
     commands.addCommand(command, {
       label: trans.__('Graph Schema'),
@@ -80,26 +80,26 @@ const variableinspector: JupyterFrontEndPlugin<IGSVariableManager> = {
               sess = (value as ReadonlyJSONObject)['sess'] as string;
             }
 
-            if (!gsGraphOpWidget || gsGraphOpWidget.isDisposed) {
-              gsGraphOpWidget = new MainAreaWidget({
-                content: new GSGraphOpWidget(
+            if (!graphOpWidget || graphOpWidget.isDisposed) {
+              graphOpWidget = new MainAreaWidget({
+                content: new GraphOpWidget(
                   { sess: sess },
                   commands,
                   translator
                 )
               });
               // register to manager
-              manager.registePanel(gsGraphOpWidget.content);
+              manager.registePanel(graphOpWidget.content);
               // track the panel
-              tracker.add(gsGraphOpWidget);
+              tracker.add(graphOpWidget);
             }
 
-            if (gsGraphOpWidget.isAttached) {
-              if (gsGraphOpWidget.content.meta['sess'] !== sess) {
+            if (graphOpWidget.isAttached) {
+              if (graphOpWidget.content.meta['sess'] !== sess) {
                 showDialog({
                   title: trans.__('WARNING'),
                   body: trans.__(
-                    `The graph schema panel already exists with different session "${gsGraphOpWidget.content.meta['sess']}". Please close it first.`
+                    `The graph schema panel already exists with different session "${graphOpWidget.content.meta['sess']}". Please close it first.`
                   ),
                   buttons: [Dialog.cancelButton()]
                 }).catch(e => console.log(e));
@@ -107,9 +107,9 @@ const variableinspector: JupyterFrontEndPlugin<IGSVariableManager> = {
               }
             } else {
               statedb.save('@graphscope/variableinspector', { sess });
-              labShell.add(gsGraphOpWidget, 'main', { mode: 'split-right' });
+              labShell.add(graphOpWidget, 'main', { mode: 'split-right' });
             }
-            labShell.activateById(gsGraphOpWidget.id);
+            labShell.activateById(graphOpWidget.id);
           });
       }
     });
@@ -119,12 +119,12 @@ const variableinspector: JupyterFrontEndPlugin<IGSVariableManager> = {
 
     // add left sidebar with rank 501
     // rank(501-899): reserved for third-party extensions.
-    const gsSideBarWidget = new GSSidebarWidget(commands, translator);
-    labShell.add(gsSideBarWidget, 'left', { rank: 501 });
+    const sideBarWidget = new SidebarWidget(commands, translator);
+    labShell.add(sideBarWidget, 'left', { rank: 501 });
 
     if (restorer) {
       // Add the sidebar to the application restorer
-      restorer.add(gsSideBarWidget, '@graphscope/sidebar:plugin');
+      restorer.add(sideBarWidget, '@graphscope/sidebar:plugin');
 
       // Add the graph operation widget to the application restorer
       restorer.restore(tracker, {
@@ -134,7 +134,7 @@ const variableinspector: JupyterFrontEndPlugin<IGSVariableManager> = {
       });
     }
 
-    manager.registePanel(gsSideBarWidget);
+    manager.registePanel(sideBarWidget);
     return manager;
   }
 };

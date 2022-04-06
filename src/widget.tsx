@@ -16,21 +16,19 @@ import { CommandIDs } from './common';
 
 import { INotebookTracker } from '@jupyterlab/notebook';
 
-import { CodeCell, MarkdownCell } from '@jupyterlab/cells';
+// import { CodeCell, MarkdownCell } from '@jupyterlab/cells';
 
 import {
   caretDownIcon,
   caretRightIcon,
   searchIcon,
   addIcon,
-  editIcon,
-  closeIcon,
+  // editIcon,
+  // closeIcon,
   Collapse,
 } from '@jupyterlab/ui-components';
 
 import React from 'react';
-
-import GsNotebook from 'gs-notebook';
 
 import { gsIcon } from './common';
 
@@ -39,6 +37,8 @@ import { IVariableInspector, VariableInspector } from './variableinspector';
 import { GSVariable } from './gsvariable';
 
 import { GraphManager } from './graphmanager';
+
+import { GraphOpComponent } from './graph';
 
 import 'bootstrap/dist/css/bootstrap.css';
 
@@ -241,333 +241,12 @@ export class CollapsibleSection extends React.Component<
 }
 
 
-namespace GSGraphBuilderComponents {
-  export interface IProperties {
-    component: GSGraphOpComponent;
-    translator?: ITranslator;
-  }
-
-  export interface IState { }
-
-  /*
-  export interface IVertexState {
-
-    properties: IVertexProperties[];
-  }
-  */
-}
-
-
-class GSGraphOpGraphBuilderComponent extends React.Component<
-  GSGraphBuilderComponents.IProperties, GSGraphBuilderComponents.IState> {
-  constructor(props: GSGraphBuilderComponents.IProperties) {
-    super(props);
-  }
-
-  createVertex(): void {
-    const vertex: GSVariable.Vertex = {
-      label: 'comment',
-      location: '/Users/lidongze/alibaba/gstest/ldbc_sample/comment_0_0.csv',
-      header_row: true,
-      delimiter: '|',
-      properties: [
-        ["creationDate", "null"], ["locationIP", "null"], ["browserUsed", 'null'], ["content", 'null'], ["length", 'null']
-      ],
-      vid_field: 'id'
-    };
-
-    this.props.component.createVertex(vertex);
-  }
-
-  createEdge(): void {
-    const edge: GSVariable.Edge = {
-      label: 'replyOf',
-      location: '/Users/lidongze/alibaba/gstest/ldbc_sample/comment_replyOf_comment_0_0.csv',
-      header_row: true,
-      delimiter: '|',
-      properties: [],
-      src_field: 'Comment.id',
-      src_label: 'comment',
-      dst_field: 'Comment.id.1',
-      dst_label: 'comment',
-    }
-
-    this.props.component.createEdge(edge);
-  }
-
-
-  render(): React.ReactNode {
-    return (
-      <>
-        <div className='jp-gsGraphOp-content'>
-          <ToolbarButtonComponent
-            label={'Create Vertex'}
-            onClick={this.createVertex.bind(this)}
-          />
-        </div>
-        <div className='jp-gsGraphOp-content'>
-          <ToolbarButtonComponent
-            label={'Create Edge'}
-            onClick={this.createEdge.bind(this)}
-          />
-        </div>
-      </>
-    )
-  }
-}
-
-
-export namespace GSGraphOpDisplayComponents {
-  export interface IProperties {
-    /**
-     * The GSGraphOpComponents
-     */
-    component: GSGraphOpComponent;
-    /**
-     * The graphscope graph operation widget.
-     */
-    widget: GSGraphOpWidget;
-    /**
-     *  Jupyterlab translator.
-     */
-    translator?: ITranslator;
-  }
-  export interface IState { }
-}
-
-
-class GSGraphOpDisplayComponent extends React.Component<
-  GSGraphOpDisplayComponents.IProperties, GSGraphOpDisplayComponents.IState> {
-  constructor(props: GSGraphOpDisplayComponents.IProperties) {
-    super(props);
-  }
-
-  insertCode(): void {
-    const trans = this.props.translator.load('jupyterlab');
-
-    const widget = this.props.widget;
-    const code = widget.graphManager.generateCode(widget.meta["sess"]);
-
-    const cell = widget.notebook.activeCell;
-    if (cell === null) {
-      showDialog({
-        title: trans.__('WRANNING'),
-        body: trans.__('No focused cell found.'),
-        buttons: [Dialog.okButton()]
-      }).catch(e => console.log(e));
-    }
-
-    if (cell instanceof MarkdownCell) {
-      cell.editor.replaceSelection('```' + '\n' + code + '\n```');
-    } else if (cell instanceof CodeCell) {
-      cell.editor.replaceSelection(code);
-    }
-  }
-
-  _render_vertex_table() {
-    const trans = this.props.translator.load('jupyterlab');
-
-    const elements: React.ReactElement<any>[] = [];
-    const contents: any[] = [];
-
-    for (let vlabel of this.props.widget.graphManager.vertices.keys()) {
-      contents.push(
-        <tr>
-          <td>{vlabel}</td>
-          <td>
-            <ToolbarButtonComponent
-              icon={editIcon}
-              onClick={() => { console.log(''); }}
-              tooltip={trans.__('edit')}
-            />
-            <ToolbarButtonComponent
-              icon={closeIcon}
-              onClick={() => { console.log(''); }}
-              tooltip={trans.__('delete')}
-            />
-          </td>
-        </tr>
-      )
-    }
-
-    elements.push(
-      <table className='jp-gsGraphOp-section-table'>
-        <tr>
-          <th>Label</th>
-          <th>Operations</th>
-        </tr>
-        {contents}
-      </table>
-    )
-
-    return elements;
-  }
-
-  _render_edge_table() {
-    const trans = this.props.translator.load('jupyterlab');
-
-    const elements: React.ReactElement<any>[] = [];
-    const contents: any[] = [];
-
-    for (let [elabel, edges] of this.props.widget.graphManager.edges) {
-      for (let e of edges) {
-        contents.push(
-          <tr>
-            <td>{elabel}</td>
-            <td>{e.src_label}</td>
-            <td>{e.dst_label}</td>
-            <td>
-              <ToolbarButtonComponent
-                icon={editIcon}
-                onClick={() => { console.log(''); }}
-                tooltip={trans.__('edit')}
-              />
-              <ToolbarButtonComponent
-                icon={closeIcon}
-                onClick={() => { console.log(''); }}
-                tooltip={trans.__('delete')}
-              />
-            </td>
-          </tr>
-        )
-      }
-    }
-
-    elements.push(
-      <table className='jp-gsGraphOp-section-table'>
-        <tr>
-          <th>Label</th>
-          <th>Src Label</th>
-          <th>Dst Label</th>
-          <th>Operations</th>
-        </tr>
-        {contents}
-      </table>
-    )
-
-    return elements;
-  }
-
-  _onCreateGraph(params: any): void {
-    console.log('cg: ', params);
-  }
-
-  render(): React.ReactNode {
-    return (
-      <GsNotebook
-        onCreateGraph={this._onCreateGraph.bind(this)}
-      />
-    )
-  }
-}
-
-/**
- * The namespace for graphscope graph schema operation component statics.
- */
-export namespace GSGraphOpComponents {
-  /**
-        * Optional Widgets
-        */
-  export enum OptionalWidgets {
-    displayWidget,
-    addVertexWidget,
-    addEdgeWidget,
-  }
-
-  /**
-        * React properties for graphscope sidebar component.
-        */
-  export interface IProperties {
-    /**
-     * Command Registry.
-     */
-    commands: CommandRegistry
-
-    /**
-     * The graphscope graph operation widget.
-     */
-    widget: GSGraphOpWidget;
-
-    /**
-     * Signal to render dom tree.
-     */
-    signal: ISignal<GSGraphOpWidget, void>;
-
-    /**
-     *  Jupyterlab translator.
-     */
-    translator?: ITranslator;
-  };
-
-  export interface IState {
-    currentWidget: OptionalWidgets;
-  };
-}
-
-
-/**
- * Base react component of graph operation widget.
- */
-class GSGraphOpComponent extends React.Component<
-  GSGraphOpComponents.IProperties, GSGraphOpComponents.IState> {
-  constructor(props: GSGraphOpComponents.IProperties) {
-    super(props);
-
-    this.state = {
-      currentWidget: GSGraphOpComponents.OptionalWidgets.displayWidget
-    }
-  }
-
-  createVertex(vertex: GSVariable.Vertex): void {
-    try {
-      this.props.widget.graphManager.addVertex(vertex);
-    } catch (ex) {
-      console.log('catch exception in createVertex: ', ex);
-    }
-    this.setState({ currentWidget: GSGraphOpComponents.OptionalWidgets.displayWidget });
-  }
-
-  createEdge(edge: GSVariable.Edge): void {
-    try {
-      this.props.widget.graphManager.addEdge(edge);
-    } catch (ex) {
-      console.log('catch exception in createEdge: ', ex);
-    }
-    this.setState({ currentWidget: GSGraphOpComponents.OptionalWidgets.displayWidget });
-  }
-
-  render() {
-    return (
-      <UseSignal signal={this.props.signal}>
-        {() => {
-          if (this.state.currentWidget === GSGraphOpComponents.OptionalWidgets.displayWidget) {
-            return <GSGraphOpDisplayComponent
-              translator={this.props.translator}
-              component={this}
-              widget={this.props.widget}
-            />
-          } else if (
-            this.state.currentWidget === GSGraphOpComponents.OptionalWidgets.addVertexWidget ||
-            this.state.currentWidget === GSGraphOpComponents.OptionalWidgets.addEdgeWidget
-          ) {
-            return <GSGraphOpGraphBuilderComponent
-              translator={this.props.translator}
-              component={this}
-            />
-          }
-        }}
-      </UseSignal>
-    )
-  }
-}
-
-
 /**
  * The widget for operate graph.
  */
-export class GSGraphOpWidget extends IVariableInspectorWidget {
+export class GraphOpWidget extends IVariableInspectorWidget {
   /**
-   * Constructs a new GSGraphOpWidget.
+   * Constructs a new GraphOpWidget.
    */
   constructor(meta: { [name: string]: any }, commands: CommandRegistry, translator?: ITranslator) {
     super();
@@ -589,7 +268,7 @@ export class GSGraphOpWidget extends IVariableInspectorWidget {
     return this._meta;
   }
 
-  get runnningChanged(): ISignal<GSGraphOpWidget, void> {
+  get runnningChanged(): ISignal<GraphOpWidget, void> {
     return this._runningChanged;
   }
 
@@ -608,7 +287,7 @@ export class GSGraphOpWidget extends IVariableInspectorWidget {
   }
 
   /**
-   * Handle hander disposed signals.
+   * Handle handler disposed signals.
    */
   protected onHandlerDisposed(sender: any, args: void): void {
     // no-op
@@ -616,7 +295,7 @@ export class GSGraphOpWidget extends IVariableInspectorWidget {
 
   render() {
     return (
-      <GSGraphOpComponent
+      <GraphOpComponent
         commands={this.commands}
         translator={this.translator}
         widget={this}
@@ -654,12 +333,12 @@ export namespace GSSidebarComponents {
     /**
      * The graphscope sidebar widget.
      */
-    widget: GSSidebarWidget;
+    widget: SidebarWidget;
 
     /**
      * Signal to render dom tree.
      */
-    signal: ISignal<GSSidebarWidget, void>;
+    signal: ISignal<SidebarWidget, void>;
 
     /**
      *  Jupyterlab translator.
@@ -728,7 +407,7 @@ function SectionListView(props: { translator: ITranslator, items: GSVariable.GSA
 /**
  * React component of sidebar.
  */
-class GSSidebarComponent extends React.Component<
+class SidebarComponent extends React.Component<
   GSSidebarComponents.IProperties, GSSidebarComponents.IState> {
   constructor(props: GSSidebarComponents.IProperties) {
     super(props);
@@ -802,7 +481,7 @@ class GSSidebarComponent extends React.Component<
 /**
  * The widget for graphscope sidebar.
  */
-export class GSSidebarWidget extends IVariableInspectorWidget {
+export class SidebarWidget extends IVariableInspectorWidget {
   /**
    * Constructs a new GSSideBarWidget.
    */
@@ -874,7 +553,7 @@ export class GSSidebarWidget extends IVariableInspectorWidget {
     this.handler = null;
   }
 
-  get runningChanged(): ISignal<GSSidebarWidget, void> {
+  get runningChanged(): ISignal<SidebarWidget, void> {
     return this._runningChanged;
   }
 
@@ -884,7 +563,7 @@ export class GSSidebarWidget extends IVariableInspectorWidget {
 
   protected render(): JSX.Element {
     return (
-      <GSSidebarComponent
+      <SidebarComponent
         commands={this.commands}
         translator={this.translator}
         widget={this}
