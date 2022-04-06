@@ -30,6 +30,8 @@ import {
 
 import React from 'react';
 
+import GsNotebook from 'gs-notebook';
+
 import { gsIcon } from './common';
 
 import { IVariableInspector, VariableInspector } from './variableinspector';
@@ -446,68 +448,17 @@ class GSGraphOpDisplayComponent extends React.Component<
     return elements;
   }
 
-  render(): React.ReactNode {
-    const trans = this.props.translator.load('jupyterlab')
-
-    return (
-      <>
-        <div className='jp-gsGraphOp-content'>
-
-          {/* vertex list */}
-          <div className='jp-gsGraphOp-section-header'>
-            <span className='jp-gsGraphOp-section-headerText'>
-              Vertex List
-            </span>
-
-            <ToolbarButtonComponent
-              icon={addIcon}
-              onClick={() => {
-                this.props.component.setState({ currentWidget: GSGraphOpComponents.OptionalWidgets.addVertexWidget })
-              }}
-              tooltip={trans.__('create vertex')}
-            />
-          </div>
-          <div className='jp-gsGraphOp-section-content'>
-            {this._render_vertex_table()}
-          </div>
-          {/* vertex list end */}
-
-          {/* edge list */}
-          <div className='jp-gsGraphOp-section-header'>
-            <span className='jp-gsGraphOp-section-headerText'>
-              Edge List
-            </span>
-
-            <ToolbarButtonComponent
-              icon={addIcon}
-              onClick={() => { console.log('click event: create a new session.'); }}
-              tooltip={trans.__('create edge')}
-            />
-          </div>
-          <div className='jp-gsGraphOp-section-content'>
-            {this._render_edge_table()}
-          </div>
-          {/* edge list end */}
-
-          {/* code view */}
-          <div className='jp-gsGraphOp-section-header'>
-            <span className='jp-gsGraphOp-section-headerText'>
-              Code View
-            </span>
-          </div>
-          <div className='jp-gsGraphOp-section-content'>
-            <ToolbarButtonComponent
-              label={'Insert'}
-              onClick={this.insertCode.bind(this)}
-              tooltip={trans.__('insert code into notebook cell')}
-            />
-          </div>
-        </div>
-      </>
-    )
+  _onCreateGraph(params: any): void {
+    console.log('cg: ', params);
   }
 
-
+  render(): React.ReactNode {
+    return (
+      <GsNotebook
+        onCreateGraph={this._onCreateGraph.bind(this)}
+      />
+    )
+  }
 }
 
 /**
