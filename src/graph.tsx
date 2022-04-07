@@ -93,7 +93,7 @@ export class GraphOpComponent extends React.Component<
         this.props.widget.graphManager.addVertex(params);
     } catch (ex) {
         showErrorMessage(
-            "Vertex Creation Failed",
+            "Failed to create vertex",
             ex,
             [Dialog.cancelButton()]
         ).catch(e => console.log(e));
@@ -108,7 +108,7 @@ export class GraphOpComponent extends React.Component<
         this.props.widget.graphManager.editVertex(params);
     } catch (ex) {
         showErrorMessage(
-            "Vertex Editing Failed",
+            "Failed to edit vertex",
             ex,
             [Dialog.cancelButton()]
         ).catch(e => console.log(e));
@@ -124,7 +124,7 @@ export class GraphOpComponent extends React.Component<
         this.props.widget.graphManager.addEdge(params);
     } catch (ex) {
         showErrorMessage(
-            "Edge Creation Failed",
+            "Failed to create edge",
             ex,
             [Dialog.cancelButton()]
         ).catch(e => console.log(e));
@@ -140,7 +140,7 @@ export class GraphOpComponent extends React.Component<
         this.props.widget.graphManager.editEdge(params);
     } catch (ex) {
         showErrorMessage(
-            "Edge Editing Failed",
+            "Failed to edit edge",
             ex,
             [Dialog.cancelButton()]
         ).catch(e => console.log(e));

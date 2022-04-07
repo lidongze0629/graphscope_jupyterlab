@@ -66,7 +66,7 @@ ${name} = ${sess}.load_from(${name}_edges, ${name}_vertices, oid_type=${oid_type
 
   addVertex(v: GSVariable.IVertex): void {
     if (this._vertices.has(v.label)) {
-      throw new Error(`Vertex label ${v.label} exists in current graph.`);
+      throw new Error(`Vertex label '${v.label}' exists in current graph.`);
     }
     this._vertices.set(v.label, v);
   }
@@ -80,7 +80,7 @@ ${name} = ${sess}.load_from(${name}_edges, ${name}_vertices, oid_type=${oid_type
       for (const e of this._edges.get(ne.label)) {
         if (ne.srcLabel === e.srcLabel && ne.dstLabel=== e.dstLabel) {
           throw new Error(
-            `Edge Label ${ne.label}(${ne.srcLabel} => ${ne.dstLabel}) exists in current graph.`
+            `Edge Label '${ne.label}(${ne.srcLabel} => ${ne.dstLabel})' exists in current graph.`
           );
         }
       }

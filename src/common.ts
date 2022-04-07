@@ -29,3 +29,11 @@ export { PALETTE_CATEGORY };
  */
 const NAMESPACE = 'graphscope';
 export { NAMESPACE };
+
+/**
+ * Utils function
+ */
+function validName(name: string): boolean {
+  return /^(?![0-9])[a-zA-Z0-9$_]+$/.test(name);
+}
+export { validName };
