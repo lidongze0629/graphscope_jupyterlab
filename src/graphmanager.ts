@@ -7,6 +7,9 @@ export class GraphManager {
   constructor(options: GraphManager.IOptions) {}
 
   generateCode(sess: string, name: string, oid_type: string, directed: boolean, generate_eid: boolean): string {
+    const py_directed = directed ? 'True' : 'False';
+    const py_generate_eid = generate_eid ? 'True' : 'False';
+
     let code = `
 from graphscope.framework.loader import Loader
     `;
@@ -17,11 +20,15 @@ ${name}_vertices = {
     `;
     if (this._vertices.size > 0) {
       for (const [l, v] of this._vertices) {
+        let idField = v.idFiled;
+        if (isNaN(Number(idField))) {
+          idField = `"${idField}"`;
+        }
         code += `
     "${l}": (
-        ${this._generate_loader(v.location, v.headerRow, v.delimiter)},
+        ${this._generate_loader(v.location, v.headerRow, v.delimiter, v.extraPrams)},
         ${this._generate_property_list(v.propertiesData)},
-        "${v.idFiled}"
+        ${idField}
     ),
         `;
       }
@@ -40,12 +47,20 @@ ${name}_edges = {
     "${l}": [`;
         // handel sub label
         for (const e of edges) {
+          let srcIdField = e.srcField;
+          let dstIdField = e.dstField;
+          if (isNaN(Number(srcIdField))) {
+            srcIdField = `"${srcIdField}"`;
+          }
+          if (isNaN(Number(dstIdField))) {
+            dstIdField = `"${dstIdField}"`;
+          }
           code += `
         (
-            ${this._generate_loader(e.location, e.headerRow, e.delimiter)},
+            ${this._generate_loader(e.location, e.headerRow, e.delimiter, e.extraPrams)},
             ${this._generate_property_list(e.propertiesData)},
-            ("${e.srcField}", "${e.srcLabel}"),
-            ("${e.dstField}", "${e.dstLabel}"),
+            (${srcIdField}, "${e.srcLabel}"),
+            (${dstIdField}, "${e.dstLabel}"),
         ),
           `;
         }
@@ -60,7 +75,7 @@ ${name}_edges = {
 
     // session load from
     code += `
-${name} = ${sess}.load_from(${name}_edges, ${name}_vertices, oid_type=${oid_type}, directed=${directed}, generate_eid=${generate_eid})`;
+${name} = ${sess}.load_from(${name}_edges, ${name}_vertices, oid_type="${oid_type}", directed=${py_directed}, generate_eid=${py_generate_eid})`;
     return code;
   }
 
@@ -127,10 +142,19 @@ ${name} = ${sess}.load_from(${name}_edges, ${name}_vertices, oid_type=${oid_type
   _generate_loader(
     location: string,
     header_row: boolean,
-    delimiter: string
+    delimiter: string,
+    extraPrams: GSVariable.IExtraParams[],
   ): string {
     const py_header_row = header_row ? 'True' : 'False';
-    return `Loader('${location}', header_row=${py_header_row}, delimiter='${delimiter}')`;
+    let loader = 'Loader(';
+    loader += `${location} header_row=${py_header_row}, delimiter='${delimiter}`;
+    for (const p of extraPrams) {
+      if (p.key !== undefined && p.value !== undefined) {
+        loader += `, ${p.key}="${p.value}"`;
+      }
+    }
+    loader += ')';
+    return loader;
   }
 
   // mapping of vlabel => vertex
