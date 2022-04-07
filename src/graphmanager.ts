@@ -26,8 +26,8 @@ ${name}_vertices = {
         }
         code += `
     "${l}": (
-        ${this._generate_loader(v.location, v.headerRow, v.delimiter, v.extraPrams)},
-        ${this._generate_property_list(v.propertiesData)},
+        ${this._generate_loader(v.location, v.headerRow, v.delimiter, v.extraParamsSwitch, v.extraParams)},
+        ${this._generate_property_list(v.selectAllProperties, v.propertiesData)},
         ${idField}
     ),
         `;
@@ -57,8 +57,8 @@ ${name}_edges = {
           }
           code += `
         (
-            ${this._generate_loader(e.location, e.headerRow, e.delimiter, e.extraPrams)},
-            ${this._generate_property_list(e.propertiesData)},
+            ${this._generate_loader(e.location, e.headerRow, e.delimiter, e.extraParamsSwitch, e.extraParams)},
+            ${this._generate_property_list(e.selectAllProperties, e.propertiesData)},
             (${srcIdField}, "${e.srcLabel}"),
             (${dstIdField}, "${e.dstLabel}"),
         ),
@@ -126,15 +126,20 @@ ${name} = ${sess}.load_from(${name}_edges, ${name}_vertices, oid_type="${oid_typ
     return this._edges;
   }
 
-  _generate_property_list(properties: GSVariable.IProperty[]): string {
+  _generate_property_list(selectAllProperties: boolean, properties: GSVariable.IProperty[]): string {
+    console.log("properties: ", properties, selectAllProperties);
     let py_property_list = '[';
-    properties.forEach(p => {
-      if (p.type === 'auto') {
-        py_property_list += `'${p.name}', `;
-      } else {
-        py_property_list += `('${p.name}', '${p.type}'), `;
-      }
-    });
+    if (!selectAllProperties && properties !== undefined) {
+      properties.forEach(p => {
+        if (p !== undefined) {
+          if (p.type === 'auto') {
+            py_property_list += `'${p.name}', `;
+          } else {
+            py_property_list += `('${p.name}', '${p.type}'), `;
+          }
+        }
+      });
+    }
     py_property_list += ']';
     return py_property_list;
   }
@@ -143,15 +148,18 @@ ${name} = ${sess}.load_from(${name}_edges, ${name}_vertices, oid_type="${oid_typ
     location: string,
     header_row: boolean,
     delimiter: string,
-    extraPrams: GSVariable.IExtraParams[],
+    extraParamsSwitch: boolean,
+    extraParams: GSVariable.IExtraParams[],
   ): string {
     const py_header_row = header_row ? 'True' : 'False';
     let loader = 'Loader(';
-    loader += `${location} header_row=${py_header_row}, delimiter='${delimiter}`;
-    for (const p of extraPrams) {
-      if (p.key !== undefined && p.value !== undefined) {
-        loader += `, ${p.key}="${p.value}"`;
-      }
+    loader += `"${location}", header_row=${py_header_row}, delimiter="${delimiter}"`;
+    if (extraParamsSwitch && extraParams !== undefined) {
+      for (const p of extraParams) {
+        if (p !== undefined && p.key !== undefined && p.value !== undefined) {
+          loader += `, ${p.key}="${p.value}"`;
+        }
+    }
     }
     loader += ')';
     return loader;

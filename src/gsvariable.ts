@@ -131,7 +131,7 @@ export namespace GSVariable {
     /**
      * Extra params for loader, used when extraParamsSwitch is true.
      */
-    extraPrams: IExtraParams[];
+    extraParams: IExtraParams[];
     /**
      * Enable selectAllProperties.
      */
@@ -173,7 +173,7 @@ export namespace GSVariable {
     /**
      * Extra params for loader, used when extraParamsSwitch is true.
      */
-    extraPrams: IExtraParams[];
+    extraParams: IExtraParams[];
     /**
      * Src field
      */
