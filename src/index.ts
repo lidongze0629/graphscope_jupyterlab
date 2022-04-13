@@ -82,11 +82,7 @@ const variableinspector: JupyterFrontEndPlugin<IGSVariableManager> = {
 
             if (!graphOpWidget || graphOpWidget.isDisposed) {
               graphOpWidget = new MainAreaWidget({
-                content: new GraphOpWidget(
-                  { sess: sess },
-                  commands,
-                  translator
-                )
+                content: new GraphOpWidget({ sess: sess }, commands, translator)
               });
               // register to manager
               manager.registePanel(graphOpWidget.content);

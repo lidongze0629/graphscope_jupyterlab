@@ -57,7 +57,7 @@ export class GraphOpComponent extends React.Component<
   }
 
   _onCreateGraph(params: any): void {
-    console.log("cg: ", params);
+    console.log('cg: ', params);
 
     const name = params.name;
     const directed = params.directed;
@@ -66,10 +66,14 @@ export class GraphOpComponent extends React.Component<
 
     const widget = this.props.widget;
     const code = widget.graphManager.generateCode(
-      widget.meta["sess"], name, oid_type, directed, generate_eid
+      widget.meta['sess'],
+      name,
+      oid_type,
+      directed,
+      generate_eid
     );
 
-    console.log(widget, widget.notebook)
+    console.log(widget, widget.notebook);
     const cell = widget.notebook.activeCell;
     if (cell === null) {
       showDialog({
@@ -87,64 +91,73 @@ export class GraphOpComponent extends React.Component<
   }
 
   _onCreateVertex(params: any): boolean {
-    console.log('create vertex: ', params);
-
     try {
-        this.props.widget.graphManager.addVertex(params);
+      this.props.widget.graphManager.addVertex(params);
     } catch (ex) {
-        showErrorMessage(
-            "Failed to create vertex",
-            ex,
-            [Dialog.cancelButton()]
-        ).catch(e => console.log(e));
-        return false;
+      showErrorMessage('Failed to create vertex', ex, [
+        Dialog.cancelButton()
+      ]).catch(e => console.log(e));
+      return false;
     }
     return true;
   }
 
   _onEditVertex(params: any): boolean {
-    console.log('ev: ', params);
     try {
-        this.props.widget.graphManager.editVertex(params);
+      this.props.widget.graphManager.editVertex(params);
     } catch (ex) {
-        showErrorMessage(
-            "Failed to edit vertex",
-            ex,
-            [Dialog.cancelButton()]
-        ).catch(e => console.log(e));
-        return false;
+      showErrorMessage('Failed to edit vertex', ex, [
+        Dialog.cancelButton()
+      ]).catch(e => console.log(e));
+      return false;
     }
     return true;
   }
 
   _onCreateEdge(params: any): boolean {
-    console.log('ce: ', params);
-
     try {
-        this.props.widget.graphManager.addEdge(params);
+      this.props.widget.graphManager.addEdge(params);
     } catch (ex) {
-        showErrorMessage(
-            "Failed to create edge",
-            ex,
-            [Dialog.cancelButton()]
-        ).catch(e => console.log(e));
-        return false;
+      showErrorMessage('Failed to create edge', ex, [
+        Dialog.cancelButton()
+      ]).catch(e => console.log(e));
+      return false;
     }
     return true;
   }
 
   _onEditEdge(params: any): boolean {
-    console.log('ee: ', params);
-
     try {
-        this.props.widget.graphManager.editEdge(params);
+      this.props.widget.graphManager.editEdge(params);
     } catch (ex) {
-        showErrorMessage(
-            "Failed to edit edge",
-            ex,
-            [Dialog.cancelButton()]
-        ).catch(e => console.log(e));
-        return false;
+      showErrorMessage('Failed to edit edge', ex, [
+        Dialog.cancelButton()
+      ]).catch(e => console.log(e));
+      return false;
+    }
+    return true;
+  }
+
+  _onDeleteVertex(params: any): boolean {
+    try {
+      this.props.widget.graphManager.deleteVertex(params);
+    } catch (ex) {
+      showErrorMessage('Failed to delete vertex', ex, [
+        Dialog.cancelButton()
+      ]).catch(e => console.log(e));
+      return false;
+    }
+    return true;
+  }
+
+  _onDeleteEdge(params: any): boolean {
+    try {
+      this.props.widget.graphManager.deleteEdge(params);
+    } catch (ex) {
+      showErrorMessage('Failed to delete edge', ex, [
+        Dialog.cancelButton()
+      ]).catch(e => console.log(e));
+      return false;
     }
     return true;
   }
@@ -160,6 +173,8 @@ export class GraphOpComponent extends React.Component<
               onEditVertex={this._onEditVertex.bind(this)}
               onCreateEdge={this._onCreateEdge.bind(this)}
               onEditEdge={this._onEditEdge.bind(this)}
+              onDeleteVertex={this._onDeleteVertex.bind(this)}
+              onDeleteEdge={this._onDeleteEdge.bind(this)}
             />
           );
         }}

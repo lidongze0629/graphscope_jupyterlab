@@ -6,7 +6,13 @@ import { GSVariable } from './gsvariable';
 export class GraphManager {
   constructor(options: GraphManager.IOptions) {}
 
-  generateCode(sess: string, name: string, oid_type: string, directed: boolean, generate_eid: boolean): string {
+  generateCode(
+    sess: string,
+    name: string,
+    oid_type: string,
+    directed: boolean,
+    generate_eid: boolean
+  ): string {
     const py_directed = directed ? 'True' : 'False';
     const py_generate_eid = generate_eid ? 'True' : 'False';
 
@@ -26,8 +32,17 @@ ${name}_vertices = {
         }
         code += `
     "${l}": (
-        ${this._generate_loader(v.location, v.headerRow, v.delimiter, v.extraParamsSwitch, v.extraParams)},
-        ${this._generate_property_list(v.selectAllProperties, v.propertiesData)},
+        ${this._generate_loader(
+          v.location,
+          v.headerRow,
+          v.delimiter,
+          v.extraParamsSwitch,
+          v.extraParams
+        )},
+        ${this._generate_property_list(
+          v.selectAllProperties,
+          v.propertiesData
+        )},
         ${idField}
     ),
         `;
@@ -57,8 +72,17 @@ ${name}_edges = {
           }
           code += `
         (
-            ${this._generate_loader(e.location, e.headerRow, e.delimiter, e.extraParamsSwitch, e.extraParams)},
-            ${this._generate_property_list(e.selectAllProperties, e.propertiesData)},
+            ${this._generate_loader(
+              e.location,
+              e.headerRow,
+              e.delimiter,
+              e.extraParamsSwitch,
+              e.extraParams
+            )},
+            ${this._generate_property_list(
+              e.selectAllProperties,
+              e.propertiesData
+            )},
             (${srcIdField}, "${e.srcLabel}"),
             (${dstIdField}, "${e.dstLabel}"),
         ),
@@ -93,7 +117,7 @@ ${name} = ${sess}.load_from(${name}_edges, ${name}_vertices, oid_type="${oid_typ
   addEdge(ne: GSVariable.IEdge): void {
     if (this._edges.has(ne.label)) {
       for (const e of this._edges.get(ne.label)) {
-        if (ne.srcLabel === e.srcLabel && ne.dstLabel=== e.dstLabel) {
+        if (ne.srcLabel === e.srcLabel && ne.dstLabel === e.dstLabel) {
           throw new Error(
             `Edge Label '${ne.label}(${ne.srcLabel} => ${ne.dstLabel})' exists in current graph.`
           );
@@ -106,16 +130,38 @@ ${name} = ${sess}.load_from(${name}_edges, ${name}_vertices, oid_type="${oid_typ
   }
 
   editEdge(ne: GSVariable.IEdge): void {
-    let edges = this._edges.get(ne.label);
+    const edges = this._edges.get(ne.label);
     // get sub label edge
     let oe: GSVariable.IEdge;
     for (const e of edges) {
-      if (ne.srcLabel === e.srcLabel && ne.dstLabel=== e.dstLabel) {
+      if (ne.srcLabel === e.srcLabel && ne.dstLabel === e.dstLabel) {
         oe = e;
       }
     }
     const index = edges.indexOf(oe);
     edges[index] = ne;
+  }
+
+  deleteVertex(v: GSVariable.IVertex): void {
+    this.vertices.delete(v.label);
+  }
+
+  deleteEdge(ne: GSVariable.IEdge): void {
+    const edges = this._edges.get(ne.label);
+    // get sub label edge
+    let oe: GSVariable.IEdge;
+    for (const e of edges) {
+      if (ne.srcLabel === e.srcLabel && ne.dstLabel === e.dstLabel) {
+        oe = e;
+      }
+    }
+    const index = edges.indexOf(oe);
+    if (index > -1) {
+      edges.splice(index, 1);
+      if (edges == undefined || edges.length == 0) {
+        this._edges.delete(ne.label);
+      }
+    }
   }
 
   get vertices(): Map<string, GSVariable.IVertex> {
@@ -126,8 +172,11 @@ ${name} = ${sess}.load_from(${name}_edges, ${name}_vertices, oid_type="${oid_typ
     return this._edges;
   }
 
-  _generate_property_list(selectAllProperties: boolean, properties: GSVariable.IProperty[]): string {
-    console.log("properties: ", properties, selectAllProperties);
+  _generate_property_list(
+    selectAllProperties: boolean,
+    properties: GSVariable.IProperty[]
+  ): string {
+    console.log('properties: ', properties, selectAllProperties);
     let py_property_list = '[';
     if (!selectAllProperties && properties !== undefined) {
       properties.forEach(p => {
@@ -149,7 +198,7 @@ ${name} = ${sess}.load_from(${name}_edges, ${name}_vertices, oid_type="${oid_typ
     header_row: boolean,
     delimiter: string,
     extraParamsSwitch: boolean,
-    extraParams: GSVariable.IExtraParams[],
+    extraParams: GSVariable.IExtraParams[]
   ): string {
     const py_header_row = header_row ? 'True' : 'False';
     let loader = 'Loader(';
@@ -159,7 +208,7 @@ ${name} = ${sess}.load_from(${name}_edges, ${name}_vertices, oid_type="${oid_typ
         if (p !== undefined && p.key !== undefined && p.value !== undefined) {
           loader += `, ${p.key}="${p.value}"`;
         }
-    }
+      }
     }
     loader += ')';
     return loader;
