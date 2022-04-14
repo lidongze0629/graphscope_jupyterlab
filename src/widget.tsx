@@ -38,6 +38,8 @@ import { GraphOpComponent } from './graph';
 
 import 'bootstrap/dist/css/bootstrap.css';
 
+import { Widget } from '@lumino/widgets';
+
 /**
  * Abstract class for variable inspector.
  *
@@ -374,9 +376,14 @@ function SectionItem(props: {
         className="jp-gsSidebar-sectionItemShutdown"
         icon={searchIcon}
         onClick={() => {
+          let body = document.createElement('div');
+          let content = props.item.content.replace(/\\n/g, '<br/>');
+          content = content.replace(/\\t/g, '&emsp;');
+          body.innerHTML = content;
           showDialog({
             title: trans.__(props.item.name),
-            body: trans.__(props.item.content),
+            body: new Widget({node: body}),
+            // body: trans.__(props.item.content),
             buttons: [Dialog.okButton()]
           }).catch(e => console.log(e));
         }}

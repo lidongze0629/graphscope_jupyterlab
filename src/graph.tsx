@@ -57,8 +57,6 @@ export class GraphOpComponent extends React.Component<
   }
 
   _onCreateGraph(params: any): void {
-    console.log('cg: ', params);
-
     const name = params.name;
     const directed = params.directed;
     const generate_eid = params.eid;
@@ -73,7 +71,6 @@ export class GraphOpComponent extends React.Component<
       generate_eid
     );
 
-    console.log(widget, widget.notebook);
     const cell = widget.notebook.activeCell;
     if (cell === null) {
       showDialog({

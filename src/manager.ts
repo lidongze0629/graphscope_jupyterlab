@@ -49,6 +49,11 @@ export class GSVariableManager implements IGSVariableManager {
 
   set notebook(nb: INotebookTracker | null) {
     this._notebook = nb;
+    if (this._notebook !== null) {
+      for (const panel of this._panels.values()) {
+        panel.notebook = this._notebook;
+      }
+    }
   }
 
   get handler(): VariableInspector.IInspectable {

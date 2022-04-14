@@ -158,7 +158,7 @@ ${name} = ${sess}.load_from(${name}_edges, ${name}_vertices, oid_type="${oid_typ
     const index = edges.indexOf(oe);
     if (index > -1) {
       edges.splice(index, 1);
-      if (edges == undefined || edges.length == 0) {
+      if (edges == undefined || edges.length === 0) {
         this._edges.delete(ne.label);
       }
     }
@@ -176,7 +176,6 @@ ${name} = ${sess}.load_from(${name}_edges, ${name}_vertices, oid_type="${oid_typ
     selectAllProperties: boolean,
     properties: GSVariable.IProperty[]
   ): string {
-    console.log('properties: ', properties, selectAllProperties);
     let py_property_list = '[';
     if (!selectAllProperties && properties !== undefined) {
       properties.forEach(p => {
