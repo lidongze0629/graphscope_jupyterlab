@@ -376,13 +376,13 @@ function SectionItem(props: {
         className="jp-gsSidebar-sectionItemShutdown"
         icon={searchIcon}
         onClick={() => {
-          let body = document.createElement('div');
+          const body = document.createElement('div');
           let content = props.item.content.replace(/\\n/g, '<br/>');
           content = content.replace(/\\t/g, '&emsp;');
           body.innerHTML = content;
           showDialog({
             title: trans.__(props.item.name),
-            body: new Widget({node: body}),
+            body: new Widget({ node: body }),
             // body: trans.__(props.item.content),
             buttons: [Dialog.okButton()]
           }).catch(e => console.log(e));

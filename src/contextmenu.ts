@@ -1,4 +1,4 @@
-import { showDialog, Dialog } from '@jupyterlab/apputils';
+// import { showDialog, Dialog } from '@jupyterlab/apputils';
 
 import { ITranslator, nullTranslator } from '@jupyterlab/translation';
 
@@ -27,15 +27,9 @@ export class ContextMenuManager {
 
     // register for sidebar item element
     this.commands.addCommand(CommandIDs.sidebar_item_open, {
-      label: 'Example',
+      label: trans.__('Example'),
       icon: buildIcon,
-      execute: () => {
-        showDialog({
-          title: trans.__('Example Title'),
-          body: trans.__('Example body'),
-          buttons: [Dialog.okButton(), Dialog.cancelButton()]
-        }).catch(e => console.log(e));
-      }
+      execute: () => {}
     });
   }
 
