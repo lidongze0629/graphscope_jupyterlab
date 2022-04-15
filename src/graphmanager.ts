@@ -200,6 +200,9 @@ ${name} = ${sess}.load_from(${name}_edges, ${name}_vertices, oid_type="${oid_typ
     extraParams: GSVariable.IExtraParams[]
   ): string {
     const py_header_row = header_row ? 'True' : 'False';
+    if (delimiter === "\t") {
+      delimiter = "\\t";
+    }
     let loader = 'Loader(';
     loader += `"${location}", header_row=${py_header_row}, delimiter="${delimiter}"`;
     if (extraParamsSwitch && extraParams !== undefined) {
