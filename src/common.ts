@@ -29,3 +29,24 @@ export { PALETTE_CATEGORY };
  */
 const NAMESPACE = 'graphscope';
 export { NAMESPACE };
+
+/**
+ * Utils function
+ */
+export function isJsonString(str: string): boolean {
+  str = str.replace(/'/g, '"');
+
+  if (JSON.stringify(str) === '{}') {
+    return false
+  } else {
+    try {
+      if (Object.prototype.toString.call(JSON.parse(str)) === '[object Object]') {
+        return true
+      } else {
+        return false
+      }
+    } catch (e) {
+      return false
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import { GSVariable } from './gsvariable';
+import { isJsonString } from './common';
 
 /**
  * Manager class to operate graph schema.
@@ -176,8 +177,13 @@ ${name} = ${sess}.load_from(${name}_edges, ${name}_vertices, oid_type="${oid_typ
     selectAllProperties: boolean,
     properties: GSVariable.IProperty[]
   ): string {
+    if (selectAllProperties) {
+      // None means select all properties in graphscope.
+      return "None";
+    }
+
     let py_property_list = '[';
-    if (!selectAllProperties && properties !== undefined) {
+    if (properties !== undefined) {
       properties.forEach(p => {
         if (p !== undefined) {
           if (p.type === 'auto') {
@@ -200,15 +206,19 @@ ${name} = ${sess}.load_from(${name}_edges, ${name}_vertices, oid_type="${oid_typ
     extraParams: GSVariable.IExtraParams[]
   ): string {
     const py_header_row = header_row ? 'True' : 'False';
-    if (delimiter === "\t") {
-      delimiter = "\\t";
+    if (delimiter === '\t') {
+      delimiter = '\\t';
     }
     let loader = 'Loader(';
     loader += `"${location}", header_row=${py_header_row}, delimiter="${delimiter}"`;
     if (extraParamsSwitch && extraParams !== undefined) {
       for (const p of extraParams) {
         if (p !== undefined && p.key !== undefined && p.value !== undefined) {
-          loader += `, ${p.key}="${p.value}"`;
+          if (isJsonString(p.value)) {
+            loader += `, ${p.key}=${p.value}`;
+          } else {
+            loader += `, ${p.key}="${p.value}"`;
+          }
         }
       }
     }
