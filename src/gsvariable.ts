@@ -123,7 +123,7 @@ export namespace GSVariable {
     /**
      * Vid field.
      */
-    idFiled: string;
+    idField: string;
     /**
      * Extra params switch for loader.
      */
@@ -174,6 +174,10 @@ export namespace GSVariable {
      * Extra params for loader, used when extraParamsSwitch is true.
      */
     extraParams: IExtraParams[];
+    /**
+     * Edge only
+     */
+    edgeOnly: boolean;
     /**
      * Src field
      */

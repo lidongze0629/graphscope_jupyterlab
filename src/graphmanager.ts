@@ -27,7 +27,7 @@ ${name}_vertices = {
     `;
     if (this._vertices.size > 0) {
       for (const [l, v] of this._vertices) {
-        let idField = v.idFiled;
+        let idField = v.idField;
         if (isNaN(Number(idField))) {
           idField = `"${idField}"`;
         }
